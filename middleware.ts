@@ -68,18 +68,18 @@ export async function middleware(request: NextRequest) {
   
   console.log('🔍 ===== CHECKING PUBLIC ROUTES =====')
   
-  // Allow public access to check-in routes (individual client check-ins)
-  if (pathname.startsWith('/checkin')) {
-    console.log('✅ PUBLIC ROUTE MATCH: /checkin - Allowing access without authentication')
-    console.log('🔓 Public check-in route accessed:', pathname)
-    console.log('🛡️ ===== MIDDLEWARE EXECUTION COMPLETED (PUBLIC ROUTE) =====')
-    return response
-  }
-
   // Allow public access to trainer check-in routes (trainer-specific check-in pages)
   if (pathname.startsWith('/trainer-checkin')) {
     console.log('✅ PUBLIC ROUTE MATCH: /trainer-checkin - Allowing access without authentication')
     console.log('🔓 Public trainer check-in route accessed:', pathname)
+    console.log('🛡️ ===== MIDDLEWARE EXECUTION COMPLETED (PUBLIC ROUTE) =====')
+    return response
+  }
+  
+  // Allow public access to check-in routes (individual client check-ins)
+  if (pathname.startsWith('/checkin')) {
+    console.log('✅ PUBLIC ROUTE MATCH: /checkin - Allowing access without authentication')
+    console.log('🔓 Public check-in route accessed:', pathname)
     console.log('🛡️ ===== MIDDLEWARE EXECUTION COMPLETED (PUBLIC ROUTE) =====')
     return response
   }

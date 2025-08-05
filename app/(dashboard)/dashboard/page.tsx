@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createBrowserSupabaseClient } from '@/lib/supabase-client'
 import { toast } from 'sonner'
 import { 
@@ -11,7 +12,10 @@ import {
   Activity,
   Clock,
   Target,
-  QrCode
+  QrCode,
+  User,
+  CheckCircle,
+  UserCheck
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -36,15 +40,52 @@ interface DashboardStats {
   completionRate: number
 }
 
+interface RecentSession {
+  id: string
+  client_name: string
+  check_in_time: string
+  time_ago: string
+}
+
 export default function DashboardPage() {
+  const router = useRouter()
   const [trainer, setTrainer] = useState<Trainer | null>(null)
   const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [recentSessions, setRecentSessions] = useState<RecentSession[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchDashboardData()
-  }, [])
+    
+    // Auto-refresh recent sessions every 30 seconds
+    const interval = setInterval(() => {
+      if (trainer?.id) {
+        fetchRecentSessions(trainer.id)
+      }
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [trainer?.id])
+
+  // Quick action handlers
+  const handleAddClient = () => {
+    router.push('/dashboard/clients')
+  }
+
+  const handleCreatePackage = () => {
+    router.push('/dashboard/packages')
+  }
+
+  const handleScheduleSession = () => {
+    // For now, navigate to clients page where they can select a client to schedule
+    router.push('/dashboard/clients')
+    toast.info('Müşteri seçtikten sonra seans planlayabilirsiniz')
+  }
+
+  const handleManualCheckIn = () => {
+    router.push('/dashboard/scan')
+  }
 
   const fetchDashboardData = async () => {
     try {
@@ -133,9 +174,69 @@ export default function DashboardPage() {
       setStats(mockStats)
       console.log('Dashboard stats:', mockStats)
 
+      // Fetch recent sessions
+      await fetchRecentSessions(trainerId)
+
     } catch (error) {
       console.error('Error fetching stats:', error)
       // Don't throw here, just log the error and continue with mock data
+    }
+  }
+
+  const fetchRecentSessions = async (trainerId: string) => {
+    try {
+      const supabase = createBrowserSupabaseClient()
+      
+      // Fetch last 5 sessions with client names
+      const { data: sessions, error } = await supabase
+        .from('sessions')
+        .select(`
+          id,
+          check_in_time,
+          clients!inner(name)
+        `)
+        .eq('trainer_id', trainerId)
+        .order('check_in_time', { ascending: false })
+        .limit(5)
+
+      if (error) {
+        console.error('Error fetching recent sessions:', error)
+        return
+      }
+
+      // Format the sessions with time ago
+      const formattedSessions: RecentSession[] = sessions.map(session => ({
+        id: session.id,
+        client_name: (session.clients as any).name,
+        check_in_time: session.check_in_time,
+        time_ago: formatTimeAgo(session.check_in_time)
+      }))
+
+      setRecentSessions(formattedSessions)
+      console.log('Recent sessions:', formattedSessions)
+
+    } catch (error) {
+      console.error('Error fetching recent sessions:', error)
+    }
+  }
+
+  const formatTimeAgo = (dateString: string): string => {
+    const now = new Date()
+    const checkInTime = new Date(dateString)
+    const diffInMinutes = Math.floor((now.getTime() - checkInTime.getTime()) / (1000 * 60))
+    
+    if (diffInMinutes < 1) {
+      return 'Az önce'
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} dakika önce`
+    } else {
+      const diffInHours = Math.floor(diffInMinutes / 60)
+      if (diffInHours < 24) {
+        return `${diffInHours} saat önce`
+      } else {
+        const diffInDays = Math.floor(diffInHours / 24)
+        return `${diffInDays} gün önce`
+      }
     }
   }
 
@@ -150,7 +251,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading your dashboard...</p>
+            <p className="text-gray-600">Dashboard yükleniyor...</p>
           </div>
         </div>
       </div>
@@ -166,10 +267,10 @@ export default function DashboardPage() {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Activity className="h-8 w-8 text-red-600" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Dashboard</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Dashboard Yüklenemedi</h3>
             <p className="text-gray-600 mb-4">{error}</p>
             <Button onClick={retryFetch} variant="outline">
-              Try Again
+              Tekrar Dene
             </Button>
           </div>
         </div>
@@ -185,10 +286,10 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2">
-              Welcome back, {trainer?.name || 'Trainer'}! 👋
+              Hoş geldiniz, {trainer?.name || 'Eğitmen'}! 👋
             </h1>
             <p className="text-purple-100">
-              Here's what's happening with your fitness business today.
+              Fitness işletmenizin bugünkü durumu.
             </p>
           </div>
           <div className="hidden sm:block">
@@ -204,13 +305,13 @@ export default function DashboardPage() {
         {/* Total Clients */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
+            <CardTitle className="text-sm font-medium">Toplam Müşteri</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalClients || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Active clients in your system
+              Sistemdeki aktif müşteriler
             </p>
           </CardContent>
         </Card>
@@ -218,13 +319,13 @@ export default function DashboardPage() {
         {/* Total Packages */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Packages</CardTitle>
+            <CardTitle className="text-sm font-medium">Toplam Paket</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalPackages || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Available training packages
+              Mevcut antrenman paketleri
             </p>
           </CardContent>
         </Card>
@@ -246,13 +347,13 @@ export default function DashboardPage() {
         {/* Sessions This Month */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sessions This Month</CardTitle>
+            <CardTitle className="text-sm font-medium">Bu Ayki Seanslar</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.sessionsThisMonth || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Completed sessions
+              Tamamlanan seanslar
             </p>
           </CardContent>
         </Card>
@@ -263,13 +364,13 @@ export default function DashboardPage() {
         {/* Average Rating */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+            <CardTitle className="text-sm font-medium">Ortalama Puan</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.averageRating || 0}/5.0</div>
             <p className="text-xs text-muted-foreground">
-              Client satisfaction score
+              Müşteri memnuniyet puanı
             </p>
           </CardContent>
         </Card>
@@ -277,13 +378,13 @@ export default function DashboardPage() {
         {/* Upcoming Sessions */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Upcoming Sessions</CardTitle>
+            <CardTitle className="text-sm font-medium">Yaklaşan Seanslar</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.upcomingSessions || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Scheduled for this week
+              Bu hafta planlanmış
             </p>
           </CardContent>
         </Card>
@@ -291,13 +392,13 @@ export default function DashboardPage() {
         {/* Completion Rate */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Tamamlanma Oranı</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.completionRate || 0}%</div>
             <p className="text-xs text-muted-foreground">
-              Session completion rate
+              Seans tamamlanma oranı
             </p>
           </CardContent>
         </Card>
@@ -305,39 +406,111 @@ export default function DashboardPage() {
         {/* Active Sessions */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
+            <CardTitle className="text-sm font-medium">Aktif Seanslar</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.activeSessions || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Currently active sessions
+              Şu anda aktif seanslar
             </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+      <div className="bg-white rounded-lg border p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Hızlı İşlemler</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
-            <Users className="h-6 w-6" />
-            <span>Add New Client</span>
+          <Button 
+            onClick={handleAddClient} 
+            variant="outline" 
+            className="h-24 p-4 flex flex-col items-center justify-center space-y-3 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer group shadow-md hover:shadow-lg border-2 hover:border-purple-300 bg-gradient-to-br from-purple-50 to-white hover:from-purple-100 hover:to-purple-50"
+          >
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors duration-200">
+              <Users className="h-6 w-6 text-purple-600 group-hover:scale-110 transition-transform duration-200" />
+            </div>
+            <span className="font-medium text-gray-900 group-hover:text-purple-700 transition-colors duration-200">Yeni Müşteri Ekle</span>
           </Button>
-          <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
-            <Package className="h-6 w-6" />
-            <span>Create Package</span>
+          <Button 
+            onClick={handleCreatePackage} 
+            variant="outline" 
+            className="h-24 p-4 flex flex-col items-center justify-center space-y-3 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer group shadow-md hover:shadow-lg border-2 hover:border-blue-300 bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50"
+          >
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200">
+              <Package className="h-6 w-6 text-blue-600 group-hover:scale-110 transition-transform duration-200" />
+            </div>
+            <span className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors duration-200">Paket Oluştur</span>
           </Button>
-          <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
-            <Calendar className="h-6 w-6" />
-            <span>Schedule Session</span>
+          <Button 
+            onClick={handleScheduleSession} 
+            variant="outline" 
+            className="h-24 p-4 flex flex-col items-center justify-center space-y-3 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer group shadow-md hover:shadow-lg border-2 hover:border-green-300 bg-gradient-to-br from-green-50 to-white hover:from-green-100 hover:to-green-50"
+          >
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors duration-200">
+              <Calendar className="h-6 w-6 text-green-600 group-hover:scale-110 transition-transform duration-200" />
+            </div>
+            <span className="font-medium text-gray-900 group-hover:text-green-700 transition-colors duration-200">Seans Planla</span>
           </Button>
-          <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
-            <QrCode className="h-6 w-6" />
-            <span>Scan QR Code</span>
+          <Button 
+            onClick={handleManualCheckIn} 
+            variant="outline" 
+            className="h-24 p-4 flex flex-col items-center justify-center space-y-3 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer group shadow-md hover:shadow-lg border-2 hover:border-orange-300 bg-gradient-to-br from-orange-50 to-white hover:from-orange-100 hover:to-orange-50"
+          >
+            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors duration-200">
+              <UserCheck className="h-6 w-6 text-orange-600 group-hover:scale-110 transition-transform duration-200" />
+            </div>
+            <span className="font-medium text-gray-900 group-hover:text-orange-700 transition-colors duration-200">Manuel Giriş</span>
           </Button>
         </div>
+      </div>
+
+      {/* Recent Check-ins */}
+      <div className="bg-white rounded-lg border p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">Son Girişler</h2>
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-xs text-gray-500">Canlı</span>
+          </div>
+        </div>
+        
+        {recentSessions.length > 0 ? (
+          <div className="space-y-3">
+            {recentSessions.map((session) => (
+              <div key={session.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{session.client_name}</p>
+                    <p className="text-sm text-gray-500">{session.time_ago}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-400">
+                    {new Date(session.check_in_time).toLocaleString('tr-TR', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    })}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User className="h-8 w-8 text-gray-400" />
+            </div>
+            <p className="text-gray-500">Henüz giriş yapılmamış</p>
+            <p className="text-sm text-gray-400 mt-1">İlk giriş yapıldığında burada görünecek</p>
+          </div>
+        )}
       </div>
     </div>
   )

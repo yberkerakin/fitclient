@@ -13,7 +13,8 @@ import {
   User,
   Menu,
   FileText,
-  Scan
+  Scan,
+  UserCheck
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { createBrowserSupabaseClient } from '@/lib/supabase-client'
@@ -158,12 +159,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       current: pathname === '/dashboard/packages'
     },
     {
-      name: 'QR Okut',
+      name: 'Manuel Giriş',
       href: '/dashboard/scan',
-      icon: Scan,
+      icon: UserCheck,
       current: pathname === '/dashboard/scan'
+    },
+    {
+      name: 'Profilim',
+      href: '/dashboard/profile',
+      icon: User,
+      current: pathname === '/dashboard/profile'
     }
   ]
+
+  // Debug navigation items
+  console.log('🧭 ===== NAVIGATION ITEMS DEBUG =====')
+  console.log('🔗 Current pathname:', pathname)
+  console.log('📋 Navigation items array:', navigationItems)
+  console.log('🔍 Profile item found:', navigationItems.find(item => item.name === 'Profilim'))
+  console.log('🔍 Profile item current state:', navigationItems.find(item => item.href === '/dashboard/profile')?.current)
+  console.log('🧭 ===== END NAVIGATION DEBUG =====')
 
   // Show loading state
   if (loading) {
@@ -171,7 +186,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-gray-600">Dashboard yükleniyor...</p>
         </div>
       </div>
     )
@@ -238,22 +253,24 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">
-                  {user.user_metadata?.name || 'Trainer'}
+                  {user.user_metadata?.name || 'Eğitmen'}
                 </p>
                 <p className="text-xs text-gray-500 truncate mt-0.5">
                   {user.email}
                 </p>
               </div>
             </div>
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              size="sm"
-              className="w-full justify-start text-gray-600 hover:text-red-600 hover:border-red-300 hover:bg-red-50 h-10 transition-all duration-200"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
+            <div className="space-y-2">
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                size="sm"
+                className="w-full justify-start text-gray-600 hover:text-red-600 hover:border-red-300 hover:bg-red-50 h-10 transition-all duration-200"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Çıkış Yap
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -314,22 +331,24 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 truncate">
-                    {user.user_metadata?.name || 'Trainer'}
+                    {user.user_metadata?.name || 'Eğitmen'}
                   </p>
                   <p className="text-xs text-gray-500 truncate mt-0.5">
                     {user.email}
                   </p>
                 </div>
               </div>
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                size="sm"
-                className="w-full justify-start text-gray-600 hover:text-red-600 hover:border-red-300 hover:bg-red-50 h-10 transition-all duration-200"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  onClick={handleLogout}
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start text-gray-600 hover:text-red-600 hover:border-red-300 hover:bg-red-50 h-10 transition-all duration-200"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Çıkış Yap
+                </Button>
+              </div>
             </div>
           </div>
         </SheetContent>
@@ -350,12 +369,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </SheetTrigger>
               </Sheet>
               <h2 className="ml-2 lg:ml-0 text-lg font-semibold text-gray-900">
-                {navigationItems.find(item => item.current)?.name || 'Dashboard'}
+                {navigationItems.find(item => item.current)?.name || 'Ana Sayfa'}
               </h2>
             </div>
             <div className="flex items-center space-x-4">
               <div className="hidden sm:block text-sm text-gray-600">
-                Welcome back, <span className="font-medium">{user.user_metadata?.name || 'Trainer'}</span>
+                Hoş geldin, <span className="font-medium">{user.user_metadata?.name || 'Eğitmen'}</span>
               </div>
               <div className="text-sm text-gray-500">
                 {user.email}

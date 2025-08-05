@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Users, QrCode, Phone, Mail, User, Package, RefreshCw } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Plus, Users, QrCode, Phone, Mail, User, Package, RefreshCw, Trash2, Eye, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { createBrowserSupabaseClient } from '@/lib/supabase-client'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Table,
   TableBody,
@@ -40,6 +51,7 @@ interface Client {
   remaining_sessions: number
   created_at: string
   updated_at?: string
+  deleted_at?: string
 }
 
 interface CreateClientData {
@@ -57,6 +69,7 @@ interface AddClientForm {
 }
 
 export default function ClientsPage() {
+  const router = useRouter()
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -71,6 +84,10 @@ export default function ClientsPage() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [sellModalOpen, setSellModalOpen] = useState(false)
   const [clientForSale, setClientForSale] = useState<Client | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
+  const [deleteConfirmations, setDeleteConfirmations] = useState<Record<string, { confirmed: boolean; timestamp: number }>>({})
+  const [deletingClientId, setDeletingClientId] = useState<string | null>(null)
 
   useEffect(() => {
     console.log('🚀 ClientsPage mounted, starting data fetch...')
@@ -172,6 +189,7 @@ export default function ClientsPage() {
         .from('clients')
         .select('*')
         .eq('trainer_id', trainer.id)
+        .is('deleted_at', null)  // Only fetch non-deleted clients
         .order('created_at', { ascending: false })
       
       console.log('🔍 Clients query from clients table:', clientsQuery)
@@ -492,6 +510,115 @@ export default function ClientsPage() {
     fetchClients()
   }
 
+  const handleDeleteClient = async (client: Client) => {
+    const now = Date.now()
+    const confirmationKey = client.id
+    const existingConfirmation = deleteConfirmations[confirmationKey]
+
+    // Check if this is the first click
+    if (!existingConfirmation || now - existingConfirmation.timestamp > 3000) {
+      // First click - show confirmation message
+      setDeleteConfirmations(prev => ({
+        ...prev,
+        [confirmationKey]: { confirmed: false, timestamp: now }
+      }))
+      
+      // Auto-clear confirmation after 3 seconds
+      setTimeout(() => {
+        setDeleteConfirmations(prev => {
+          const newState = { ...prev }
+          delete newState[confirmationKey]
+          return newState
+        })
+      }, 3000)
+      
+      toast.info('Silmek için tekrar tıklayın', { duration: 3000 })
+      return
+    }
+
+    // Second click within 3 seconds - proceed with deletion
+    setDeleteConfirmations(prev => {
+      const newState = { ...prev }
+      delete newState[confirmationKey]
+      return newState
+    })
+    
+    setClientToDelete(client)
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDeleteClient = async () => {
+    if (!clientToDelete) return
+
+    try {
+      setDeletingClientId(clientToDelete.id)
+      console.log('🔄 Starting to soft delete client...')
+      console.log('📝 Client to delete:', clientToDelete)
+      
+      const supabase = createBrowserSupabaseClient()
+
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      
+      if (userError || !user) {
+        console.error('❌ Error getting user:', userError)
+        toast.error('Kullanıcı bilgisi alınırken hata oluştu')
+        return
+      }
+
+      // Get trainer record
+      const { data: trainer, error: trainerError } = await supabase
+        .from('trainers')
+        .select('id, name, email')
+        .eq('user_id', user.id)
+        .single()
+
+      if (trainerError || !trainer) {
+        console.error('❌ Error getting trainer:', trainerError)
+        toast.error('Eğitmen profili alınırken hata oluştu')
+        return
+      }
+
+      console.log('🏋️ Trainer found:', trainer)
+
+      // Soft delete client by setting deleted_at timestamp
+      const { error: deleteError } = await supabase
+        .from('clients')
+        .update({ 
+          deleted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', clientToDelete.id)
+
+      if (deleteError) {
+        console.error('❌ Error soft deleting client:', deleteError)
+        console.error('❌ Delete error details:', {
+          message: deleteError.message,
+          code: deleteError.code,
+          details: deleteError.details,
+          hint: deleteError.hint
+        })
+        toast.error('Müşteri silinirken hata oluştu')
+        return
+      }
+
+      console.log('✅ Client soft deleted successfully:', clientToDelete)
+
+      // Refresh clients list
+      fetchClients()
+      toast.success('Müşteri başarıyla silindi!')
+      
+    } catch (error) {
+      console.error('❌ Unexpected error soft deleting client:', error)
+      toast.error('Müşteri silinirken beklenmeyen hata oluştu')
+    } finally {
+      setDeletingClientId(null)
+      setSubmitting(false)
+      setDeleteDialogOpen(false)
+      setClientToDelete(null)
+    }
+  }
+
   // Debug function to verify purchase flow
   const debugPurchaseFlow = async () => {
     console.log('🔍 DEBUG: Checking purchase flow...')
@@ -536,6 +663,10 @@ export default function ClientsPage() {
       .eq('trainer_id', trainer.id)
     
     console.log('👤 Client sessions:', clientSessions)
+  }
+
+  const handleViewDetails = (client: Client) => {
+    router.push(`/dashboard/clients/${client.id}`)
   }
 
   if (loading) {
@@ -732,7 +863,11 @@ export default function ClientsPage() {
           {/* Mobile Cards */}
           <div className="grid grid-cols-1 gap-4 lg:hidden">
             {clients.map((client) => (
-              <Card key={client.id}>
+              <Card 
+                key={client.id}
+                className="cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 border-2 hover:border-purple-200"
+                onClick={() => handleViewDetails(client)}
+              >
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center">
@@ -743,7 +878,21 @@ export default function ClientsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleSellPackageClick(client)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleViewDetails(client)
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        Detaylar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleSellPackageClick(client)
+                        }}
                       >
                         <Package className="h-4 w-4 mr-1" />
                         Paket Sat
@@ -751,10 +900,39 @@ export default function ClientsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleQRCodeClick(client)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleQRCodeClick(client)
+                        }}
                       >
                         <QrCode className="h-4 w-4 mr-1" />
                         QR Kod
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteClient(client)
+                        }}
+                        disabled={deletingClientId === client.id}
+                        className={`transition-all duration-200 ${
+                          deleteConfirmations[client.id] 
+                            ? 'bg-red-50 border-red-300 text-red-700 hover:bg-red-100' 
+                            : 'hover:bg-red-50 hover:border-red-200 hover:text-red-600'
+                        }`}
+                      >
+                        {deletingClientId === client.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-600 mr-1"></div>
+                            Siliniyor...
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            {deleteConfirmations[client.id] ? 'Tekrar Tıkla' : 'Sil'}
+                          </>
+                        )}
                       </Button>
                     </div>
                   </CardTitle>
@@ -790,6 +968,13 @@ export default function ClientsPage() {
                       </Badge>
                     </div>
                   </div>
+                  {/* Visual indicator for clickable card */}
+                  <div className="flex items-center justify-end pt-2">
+                    <div className="flex items-center text-sm text-purple-600 font-medium">
+                      <span>Detayları Gör</span>
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -810,7 +995,11 @@ export default function ClientsPage() {
                 </TableHeader>
                 <TableBody>
                   {clients.map((client) => (
-                    <TableRow key={client.id}>
+                    <TableRow 
+                      key={client.id}
+                      className="cursor-pointer hover:bg-purple-50 transition-colors duration-200"
+                      onClick={() => handleViewDetails(client)}
+                    >
                       <TableCell className="font-medium">
                         <div className="flex items-center">
                           <User className="h-4 w-4 mr-2 text-purple-600" />
@@ -841,11 +1030,25 @@ export default function ClientsPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-2 group">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleSellPackageClick(client)}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleViewDetails(client)
+                            }}
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            Detaylar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleSellPackageClick(client)
+                            }}
                           >
                             <Package className="h-4 w-4 mr-1" />
                             Paket Sat
@@ -853,10 +1056,39 @@ export default function ClientsPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleQRCodeClick(client)}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleQRCodeClick(client)
+                            }}
                           >
                             <QrCode className="h-4 w-4 mr-1" />
                             QR Kod
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteClient(client)
+                            }}
+                            disabled={deletingClientId === client.id}
+                            className={`opacity-0 group-hover:opacity-100 transition-all duration-200 ${
+                              deleteConfirmations[client.id] 
+                                ? 'bg-red-50 border-red-300 text-red-700 hover:bg-red-100' 
+                                : 'hover:bg-red-50 hover:border-red-200 hover:text-red-600'
+                            }`}
+                          >
+                            {deletingClientId === client.id ? (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-600 mr-1"></div>
+                                Siliniyor...
+                              </>
+                            ) : (
+                              <>
+                                <Trash2 className="h-3 w-3 mr-1" />
+                                {deleteConfirmations[client.id] ? 'Tekrar Tıkla' : 'Sil'}
+                              </>
+                            )}
                           </Button>
                         </div>
                       </TableCell>
@@ -889,6 +1121,32 @@ export default function ClientsPage() {
         client={clientForSale}
         onPackageSold={handlePackageSold}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Müşteriyi Sil</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>Bu müşteriyi silmek istediğinize emin misiniz?</p>
+              <p className="text-red-600 font-medium">⚠️ Dikkat: Müşterinin tüm ders kayıtları da silinecektir!</p>
+              <p className="text-sm text-gray-600">Not: Müşteri verileri kalıcı olarak silinmeyecek, sadece gizlenecektir.</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)} disabled={deletingClientId !== null}>
+              İptal
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteClient} 
+              disabled={deletingClientId !== null}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deletingClientId !== null ? 'Siliniyor...' : 'Sil'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 } 

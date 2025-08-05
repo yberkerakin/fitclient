@@ -7,7 +7,15 @@
   "background_color": "#ffffff",
   "theme_color": "#7c3aed",
   "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "tr",
+  "categories": ["health", "fitness", "business"],
   "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    },
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
@@ -21,7 +29,44 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["health", "fitness", "business"],
-  "lang": "tr",
-  "dir": "ltr"
+  "shortcuts": [
+    {
+      "name": "Manuel Giriş",
+      "short_name": "Giriş",
+      "description": "Manuel müşteri girişi yapın",
+      "url": "/dashboard/scan",
+      "icons": [
+        {
+          "src": "/favicon.ico",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "QR Kodum",
+      "short_name": "QR",
+      "description": "QR kodunuzu görüntüleyin",
+      "url": "/dashboard/trainer-qr",
+      "icons": [
+        {
+          "src": "/favicon.ico",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-narrow.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
 } 

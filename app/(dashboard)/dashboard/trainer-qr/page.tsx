@@ -315,6 +315,11 @@ export default function TrainerQRPage() {
                     Müşterileriniz bu QR kodu okutarak ders girişi yapabilir
                   </p>
                   
+                  {/* Simple Instruction */}
+                  <p className="text-sm text-gray-500 mt-2">
+                    Müşteriler QR okutunca çıkan linke tıklasın
+                  </p>
+                  
                   {/* URL Status Indicator */}
                   {process.env.NEXT_PUBLIC_APP_URL && (
                     <div className={`mt-3 p-2 rounded-lg text-xs font-medium ${

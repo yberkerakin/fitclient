@@ -57,7 +57,10 @@ export interface Client {
   phone?: string
   email?: string
   qr_code?: string
+  remaining_sessions: number
   created_at: string // ISO 8601 timestamp
+  updated_at?: string // ISO 8601 timestamp
+  deleted_at?: string // ISO 8601 timestamp for soft delete
 }
 
 export interface Package {
