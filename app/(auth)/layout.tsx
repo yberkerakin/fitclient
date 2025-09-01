@@ -23,7 +23,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             </h1>
           </div>
           <p className="text-white/80 text-sm">
-            Manage your fitness business with ease
+            Fitness işletmenizi kolayca yönetin
           </p>
         </div>
 
@@ -35,7 +35,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-white/60 text-xs">
-            © 2024 FitClient. All rights reserved.
+            © 2024 FitClient. Tüm hakları saklıdır.
           </p>
         </div>
       </div>

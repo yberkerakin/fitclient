@@ -38,14 +38,14 @@ export default function LoginPage() {
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
+      newErrors.email = 'E-posta gerekli'
     } else if (!isValidEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
+      newErrors.email = 'Lütfen geçerli bir e-posta adresi girin'
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = 'Password is required'
+      newErrors.password = 'Şifre gerekli'
     }
 
     setErrors(newErrors)
@@ -64,12 +64,12 @@ export default function LoginPage() {
     e.preventDefault()
     
     if (!validateForm()) {
-      toast.error('Please fix the errors in the form')
+      toast.error('Lütfen formdaki hataları düzeltin')
       return
     }
 
     setLoading(true)
-    const loadingToast = toast.loading('Signing you in...')
+    const loadingToast = toast.loading('Giriş yapılıyor...')
 
     try {
       const supabase = createBrowserSupabaseClient()
@@ -85,8 +85,8 @@ export default function LoginPage() {
 
       if (data.user) {
         toast.dismiss(loadingToast)
-        toast.success('Welcome back!', {
-          description: 'Successfully signed in. Redirecting to dashboard...'
+        toast.success('Tekrar hoş geldiniz!', {
+          description: 'Başarıyla giriş yapıldı. Dashboard\'a yönlendiriliyorsunuz...'
         })
 
         // Redirect to dashboard immediately
@@ -96,21 +96,21 @@ export default function LoginPage() {
       toast.dismiss(loadingToast)
       
       // Handle specific error cases
-      let errorMessage = 'Sign in failed. Please try again.'
+      let errorMessage = 'Giriş başarısız. Lütfen tekrar deneyin.'
       
       if (error.message.includes('Invalid login credentials') || error.message.includes('Invalid email or password')) {
-        errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+        errorMessage = 'Geçersiz e-posta veya şifre'
       } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = 'Please check your email and confirm your account before signing in.'
+        errorMessage = 'Lütfen e-postanızı kontrol edin ve giriş yapmadan önce hesabınızı onaylayın.'
       } else if (error.message.includes('Too many requests')) {
-        errorMessage = 'Too many sign-in attempts. Please wait a few minutes and try again.'
+        errorMessage = 'Çok fazla giriş denemesi. Lütfen birkaç dakika bekleyin ve tekrar deneyin.'
       } else if (error.message.includes('User not found')) {
-        errorMessage = 'No account found with this email address. Please check your email or create a new account.'
+        errorMessage = 'Bu e-posta adresi ile hesap bulunamadı. Lütfen e-postanızı kontrol edin veya yeni hesap oluşturun.'
       } else if (error.message.includes('Password')) {
-        errorMessage = 'Incorrect password. Please try again.'
+        errorMessage = 'Yanlış şifre. Lütfen tekrar deneyin.'
       }
 
-      toast.error('Sign in failed', {
+      toast.error('Giriş başarısız', {
         description: errorMessage
       })
     } finally {
@@ -122,21 +122,21 @@ export default function LoginPage() {
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome back
+          Tekrar hoş geldiniz
         </h2>
         <p className="text-gray-600 text-sm">
-          Sign in to your FitClient account
+          FitClient hesabınıza giriş yapın
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email Field */}
         <div className="space-y-2">
-          <Label htmlFor="email">Email Address</Label>
+          <Label htmlFor="email">E-posta Adresi</Label>
           <Input
             id="email"
             type="email"
-            placeholder="Enter your email"
+            placeholder="E-posta adresinizi girin"
             value={formData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
             className={errors.email ? 'border-red-500' : ''}
@@ -151,11 +151,11 @@ export default function LoginPage() {
 
         {/* Password Field */}
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Şifre</Label>
           <Input
             id="password"
             type="password"
-            placeholder="Enter your password"
+            placeholder="Şifrenizi girin"
             value={formData.password}
             onChange={(e) => handleInputChange('password', e.target.value)}
             className={errors.password ? 'border-red-500' : ''}
@@ -181,14 +181,14 @@ export default function LoginPage() {
               htmlFor="rememberMe" 
               className="text-sm text-gray-600 cursor-pointer"
             >
-              Remember me
+              Beni hatırla
             </Label>
           </div>
           <Link
             href="/forgot-password"
             className="text-sm text-purple-600 hover:text-purple-500 transition-colors duration-200"
           >
-            Forgot password?
+            Şifrenizi mi unuttunuz?
           </Link>
         </div>
 
@@ -201,10 +201,10 @@ export default function LoginPage() {
           {loading ? (
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Signing in...</span>
+              <span>Giriş yapılıyor...</span>
             </div>
           ) : (
-            'Sign In'
+            'Giriş Yap'
           )}
         </Button>
       </form>
@@ -212,12 +212,12 @@ export default function LoginPage() {
       {/* Register Link */}
       <div className="text-center mt-6">
         <p className="text-gray-600 text-sm">
-          Don't have an account?{' '}
+          Hesabınız yok mu?{' '}
           <Link 
             href="/register" 
             className="font-medium text-purple-600 hover:text-purple-500 transition-colors duration-200 underline"
           >
-            Register here
+            Üye olun
           </Link>
         </p>
       </div>

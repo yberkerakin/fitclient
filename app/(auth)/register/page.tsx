@@ -45,11 +45,11 @@ export default function RegisterPage() {
     if (/[0-9]/.test(password)) score++
     if (/[^A-Za-z0-9]/.test(password)) score++
     
-    if (score <= 1) return { strength: 'weak', color: 'bg-red-500', width: 'w-1/5' }
-    if (score <= 2) return { strength: 'fair', color: 'bg-orange-500', width: 'w-2/5' }
-    if (score <= 3) return { strength: 'good', color: 'bg-yellow-500', width: 'w-3/5' }
-    if (score <= 4) return { strength: 'strong', color: 'bg-blue-500', width: 'w-4/5' }
-    return { strength: 'very strong', color: 'bg-green-500', width: 'w-full' }
+    if (score <= 1) return { strength: 'zayıf', color: 'bg-red-500', width: 'w-1/5' }
+    if (score <= 2) return { strength: 'orta', color: 'bg-orange-500', width: 'w-2/5' }
+    if (score <= 3) return { strength: 'iyi', color: 'bg-yellow-500', width: 'w-3/5' }
+    if (score <= 4) return { strength: 'güçlü', color: 'bg-blue-500', width: 'w-4/5' }
+    return { strength: 'çok güçlü', color: 'bg-green-500', width: 'w-full' }
   }
 
   const passwordStrength = getPasswordStrength(formData.password)
@@ -60,30 +60,30 @@ export default function RegisterPage() {
 
     // Name validation
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
+      newErrors.name = 'Ad Soyad gerekli'
     } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters'
+      newErrors.name = 'Ad Soyad en az 2 karakter olmalı'
     }
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
+      newErrors.email = 'E-posta gerekli'
     } else if (!isValidEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
+      newErrors.email = 'Lütfen geçerli bir e-posta adresi girin'
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = 'Password is required'
+      newErrors.password = 'Şifre gerekli'
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
+      newErrors.password = 'Şifre en az 8 karakter olmalı'
     }
 
     // Confirm password validation
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password'
+      newErrors.confirmPassword = 'Lütfen şifrenizi tekrar girin'
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
+      newErrors.confirmPassword = 'Şifreler eşleşmiyor'
     }
 
     setErrors(newErrors)
@@ -102,12 +102,12 @@ export default function RegisterPage() {
     e.preventDefault()
     
     if (!validateForm()) {
-      toast.error('Please fix the errors in the form')
+      toast.error('Lütfen formdaki hataları düzeltin')
       return
     }
 
     setLoading(true)
-    const loadingToast = toast.loading('Creating your account...')
+    const loadingToast = toast.loading('Hesabınız oluşturuluyor...')
 
     try {
       const supabase = createBrowserSupabaseClient()
@@ -180,8 +180,8 @@ export default function RegisterPage() {
         // Don't throw error here, just log it and continue
         // User can still sign in manually later
         toast.dismiss(loadingToast)
-        toast.success('Account created successfully!', {
-          description: 'Please sign in with your new credentials.'
+        toast.success('Hesap başarıyla oluşturuldu!', {
+          description: 'Lütfen yeni bilgilerinizle giriş yapın.'
         })
         router.push('/login')
         return
@@ -192,8 +192,8 @@ export default function RegisterPage() {
         
         // All operations succeeded
         toast.dismiss(loadingToast)
-        toast.success('Registration successful!', {
-          description: 'Welcome to FitClient! Redirecting to dashboard...'
+        toast.success('Kayıt başarılı!', {
+          description: 'FitClient\'e hoş geldiniz! Dashboard\'a yönlendiriliyorsunuz...'
         })
 
         // TODO: Remove auto-login in production - redirect to dashboard immediately
@@ -212,24 +212,24 @@ export default function RegisterPage() {
       })
 
       // Show specific error messages based on error type
-      let errorMessage = 'Registration failed'
-      let errorDescription = 'Something went wrong. Please try again.'
+      let errorMessage = 'Kayıt başarısız'
+      let errorDescription = 'Bir şeyler yanlış gitti. Lütfen tekrar deneyin.'
 
       if (error.message.includes('Authentication failed')) {
-        errorMessage = 'Account creation failed'
+        errorMessage = 'Hesap oluşturma başarısız'
         errorDescription = error.message.replace('Authentication failed: ', '')
       } else if (error.message.includes('Trainer profile creation failed')) {
-        errorMessage = 'Profile setup failed'
+        errorMessage = 'Profil kurulumu başarısız'
         errorDescription = error.message.replace('Trainer profile creation failed: ', '')
       } else if (error.message.includes('User creation failed')) {
-        errorMessage = 'User creation failed'
-        errorDescription = 'Unable to create user account. Please try again.'
+        errorMessage = 'Kullanıcı oluşturma başarısız'
+        errorDescription = 'Kullanıcı hesabı oluşturulamadı. Lütfen tekrar deneyin.'
       } else if (error.message.includes('Email already registered')) {
-        errorMessage = 'Email already exists'
-        errorDescription = 'An account with this email already exists. Please sign in instead.'
+        errorMessage = 'E-posta zaten mevcut'
+        errorDescription = 'Bu e-posta ile zaten bir hesap var. Lütfen giriş yapın.'
       } else if (error.message.includes('Password')) {
-        errorMessage = 'Password issue'
-        errorDescription = 'Please ensure your password meets the requirements.'
+        errorMessage = 'Şifre sorunu'
+        errorDescription = 'Lütfen şifrenizin gereksinimleri karşıladığından emin olun.'
       }
 
       toast.error(errorMessage, {
@@ -244,21 +244,21 @@ export default function RegisterPage() {
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Create your account
+          Hesap Oluştur
         </h2>
         <p className="text-gray-600 text-sm">
-          Start managing your fitness business today
+          Fitness işletmenizi bugün yönetmeye başlayın
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Name Field */}
         <div className="space-y-2">
-          <Label htmlFor="name">Full Name</Label>
+          <Label htmlFor="name">Ad Soyad</Label>
           <Input
             id="name"
             type="text"
-            placeholder="Enter your full name"
+            placeholder="Adınızı ve soyadınızı girin"
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
             className={errors.name ? 'border-red-500' : ''}
@@ -273,11 +273,11 @@ export default function RegisterPage() {
 
         {/* Email Field */}
         <div className="space-y-2">
-          <Label htmlFor="email">Email Address</Label>
+          <Label htmlFor="email">E-posta Adresi</Label>
           <Input
             id="email"
             type="email"
-            placeholder="Enter your email"
+            placeholder="E-posta adresinizi girin"
             value={formData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
             className={errors.email ? 'border-red-500' : ''}
@@ -292,11 +292,11 @@ export default function RegisterPage() {
 
         {/* Password Field */}
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Şifre</Label>
           <Input
             id="password"
             type="password"
-            placeholder="Create a strong password"
+            placeholder="Güçlü bir şifre oluşturun"
             value={formData.password}
             onChange={(e) => handleInputChange('password', e.target.value)}
             className={errors.password ? 'border-red-500' : ''}
@@ -305,12 +305,12 @@ export default function RegisterPage() {
           {formData.password && (
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="text-gray-500">Password strength:</span>
+                <span className="text-gray-500">Şifre gücü:</span>
                 <span className={`font-medium ${
-                  passwordStrength.strength === 'weak' ? 'text-red-500' :
-                  passwordStrength.strength === 'fair' ? 'text-orange-500' :
-                  passwordStrength.strength === 'good' ? 'text-yellow-500' :
-                  passwordStrength.strength === 'strong' ? 'text-blue-500' :
+                  passwordStrength.strength === 'zayıf' ? 'text-red-500' :
+                  passwordStrength.strength === 'orta' ? 'text-orange-500' :
+                  passwordStrength.strength === 'iyi' ? 'text-yellow-500' :
+                  passwordStrength.strength === 'güçlü' ? 'text-blue-500' :
                   'text-green-500'
                 }`}>
                   {passwordStrength.strength}
@@ -332,11 +332,11 @@ export default function RegisterPage() {
 
         {/* Confirm Password Field */}
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Label htmlFor="confirmPassword">Şifre Tekrar</Label>
           <Input
             id="confirmPassword"
             type="password"
-            placeholder="Confirm your password"
+            placeholder="Şifrenizi tekrar girin"
             value={formData.confirmPassword}
             onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
             className={errors.confirmPassword ? 'border-red-500' : ''}
@@ -358,10 +358,10 @@ export default function RegisterPage() {
           {loading ? (
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Creating account...</span>
+              <span>Hesap oluşturuluyor...</span>
             </div>
           ) : (
-            'Create Account'
+            'Hesap Oluştur'
           )}
         </Button>
       </form>
@@ -369,12 +369,12 @@ export default function RegisterPage() {
       {/* Login Link */}
       <div className="text-center mt-6">
         <p className="text-gray-600 text-sm">
-          Already have an account?{' '}
+          Zaten hesabınız var mı?{' '}
           <Link 
             href="/login" 
             className="font-medium text-purple-600 hover:text-purple-500 transition-colors duration-200"
           >
-            Sign in here
+            Giriş yapın
           </Link>
         </p>
       </div>
