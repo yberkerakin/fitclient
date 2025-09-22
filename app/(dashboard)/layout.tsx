@@ -147,7 +147,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       current: pathname === '/dashboard/trainer-qr'
     },
     {
-      name: 'Müşteriler',
+      name: 'Üyeler',
       href: '/dashboard/clients',
       icon: Users,
       current: pathname === '/dashboard/clients'

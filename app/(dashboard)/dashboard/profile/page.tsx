@@ -621,10 +621,10 @@ export default function ProfilePage() {
       link.download = `musteri-listesi-${new Date().toISOString().split('T')[0]}.csv`
       link.click()
 
-      toast.success('Müşteri listesi dışa aktarıldı')
+      toast.success('Üye listesi dışa aktarıldı')
     } catch (error) {
       console.error('Error exporting client list:', error)
-      toast.error('Müşteri listesi dışa aktarılırken hata oluştu')
+      toast.error('Üye listesi dışa aktarılırken hata oluştu')
     } finally {
       setExporting(false)
     }
@@ -683,7 +683,7 @@ export default function ProfilePage() {
               <thead>
                 <tr>
                   <th>Tarih</th>
-                  <th>Müşteri</th>
+                  <th>Üye</th>
                   <th>Paket</th>
                   <th>Tutar</th>
                 </tr>
@@ -743,7 +743,7 @@ export default function ProfilePage() {
       if (error) throw error
 
       // Create Excel-like CSV content
-      const headers = ['ID', 'Tarih', 'Saat', 'Müşteri', 'Paket']
+      const headers = ['ID', 'Tarih', 'Saat', 'Üye', 'Paket']
       const csvContent = [
         headers.join(','),
         ...sessions?.map(session => [
@@ -1046,12 +1046,12 @@ export default function ProfilePage() {
               <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Müşteri Sadakati</h3>
-                    <p className="text-gray-600">Son 30 günde aktif müşteri oranı</p>
+                    <h3 className="text-lg font-semibold text-gray-900">Üye Sadakati</h3>
+                    <p className="text-gray-600">Son 30 günde aktif üye oranı</p>
                   </div>
                   <div className="text-right">
                     <div className="text-3xl font-bold text-purple-600">{analytics.clientRetention}%</div>
-                    <div className="text-sm text-gray-500">Aktif Müşteri</div>
+                    <div className="text-sm text-gray-500">Aktif Üye</div>
                   </div>
                 </div>
                 <div className="mt-4">
@@ -1261,8 +1261,8 @@ export default function ProfilePage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                      <p className="font-medium text-gray-900">Yeni Müşteri Kaydı</p>
-                      <p className="text-sm text-gray-600">Yeni müşteri kayıt olduğunda bildirim al</p>
+                      <p className="font-medium text-gray-900">Yeni Üye Kaydı</p>
+                      <p className="text-sm text-gray-600">Yeni üye kayıt olduğunda bildirim al</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -1284,7 +1284,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                       <p className="font-medium text-gray-900">Düşük Paket Seansları</p>
-                      <p className="text-sm text-gray-600">Müşteri seansları azaldığında bildirim al</p>
+                      <p className="text-sm text-gray-600">Üye seansları azaldığında bildirim al</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -1353,8 +1353,8 @@ export default function ProfilePage() {
 
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                      <p className="font-medium text-gray-900">Yeni Müşteri Kaydı</p>
-                      <p className="text-sm text-gray-600">Yeni müşteri kayıt olduğunda bildirim al</p>
+                      <p className="font-medium text-gray-900">Yeni Üye Kaydı</p>
+                      <p className="text-sm text-gray-600">Yeni üye kayıt olduğunda bildirim al</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -1370,7 +1370,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                       <p className="font-medium text-gray-900">Düşük Paket Seansları</p>
-                      <p className="text-sm text-gray-600">Müşteri seansları azaldığında bildirim al</p>
+                      <p className="text-sm text-gray-600">Üye seansları azaldığında bildirim al</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -1411,8 +1411,8 @@ export default function ProfilePage() {
 
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                      <p className="font-medium text-gray-900">Yeni Müşteri Kaydı</p>
-                      <p className="text-sm text-gray-600">Yeni müşteri kayıt olduğunda SMS al</p>
+                      <p className="font-medium text-gray-900">Yeni Üye Kaydı</p>
+                      <p className="text-sm text-gray-600">Yeni üye kayıt olduğunda SMS al</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -1428,7 +1428,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                       <p className="font-medium text-gray-900">Düşük Paket Seansları</p>
-                      <p className="text-sm text-gray-600">Müşteri seansları azaldığında SMS al</p>
+                      <p className="text-sm text-gray-600">Üye seansları azaldığında SMS al</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -1505,8 +1505,8 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-3">
                       <FileText className="w-8 h-8 text-blue-600" />
                       <div>
-                        <h4 className="font-medium text-gray-900">Müşteri Listesi</h4>
-                        <p className="text-sm text-gray-600">Tüm müşteri bilgilerini CSV formatında dışa aktar</p>
+                        <h4 className="font-medium text-gray-900">Üye Listesi</h4>
+                        <p className="text-sm text-gray-600">Tüm üye bilgilerini CSV formatında dışa aktar</p>
                       </div>
                     </div>
                     <Button
@@ -1620,7 +1620,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
                   <div className="text-2xl font-bold text-purple-600">{statistics.totalClients}</div>
-                  <div className="text-sm text-gray-600">Toplam Müşteri</div>
+                  <div className="text-sm text-gray-600">Toplam Üye</div>
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
                   <div className="text-2xl font-bold text-blue-600">{statistics.activePackages}</div>
@@ -1658,8 +1658,8 @@ export default function ProfilePage() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Müşteri Limiti:</span>
-                  <span className="font-medium">50 müşteri</span>
+                  <span className="text-gray-600">Üye Limiti:</span>
+                  <span className="font-medium">50 üye</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Paket Limiti:</span>

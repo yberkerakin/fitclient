@@ -73,7 +73,7 @@ export default function CheckInPage() {
       
       if (!clientWithSessions) {
         console.error('❌ Client not found or error occurred')
-        setError('Müşteri bulunamadı veya erişim hatası')
+        setError('Üye bulunamadı veya erişim hatası')
         setLoading(false)
         return
       }
@@ -84,7 +84,7 @@ export default function CheckInPage() {
 
     } catch (error) {
       console.error('❌ Error fetching client details:', error)
-      setError('Müşteri bilgileri alınırken hata oluştu')
+      setError('Üye bilgileri alınırken hata oluştu')
       setLoading(false)
     }
   }
@@ -271,12 +271,12 @@ export default function CheckInPage() {
           
           <div className="space-y-4">
             <h1 className="text-3xl font-bold text-white">
-              Müşteri Bulunamadı
+              Üye Bulunamadı
             </h1>
             
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
               <p className="text-lg text-white">
-                Bu QR kod ile ilişkili müşteri bulunamadı.
+                Bu QR kod ile ilişkili üye bulunamadı.
               </p>
             </div>
             

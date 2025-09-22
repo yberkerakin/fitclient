@@ -56,7 +56,7 @@ export default function TrainerQRPage() {
       console.log('✅ Trainer found:', trainerData)
       setTrainer(trainerData)
 
-      // Generate QR code URL - Always use NEXT_PUBLIC_APP_URL for consistent QR codes
+      // Generate QR code URL - Use new /go/ route for shorter, simpler QR codes
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL
       if (!baseUrl) {
         console.error('❌ NEXT_PUBLIC_APP_URL is not set!')
@@ -64,7 +64,7 @@ export default function TrainerQRPage() {
         return
       }
       
-      const checkinUrl = `${baseUrl}/trainer-checkin/${trainerData.id}`
+      const checkinUrl = `${baseUrl}/go/${trainerData.id}`
       
       console.log('🔗 ===== QR CODE URL GENERATION =====')
       console.log('🌐 Base URL (NEXT_PUBLIC_APP_URL):', baseUrl)
@@ -198,7 +198,7 @@ export default function TrainerQRPage() {
         </head>
         <body>
           <div class="qr-container">
-            <div class="qr-title">Müşteri Giriş QR Kodu</div>
+            <div class="qr-title">Üye Giriş QR Kodu</div>
             
             <div class="qr-code">
               <img src="${qrCodeUrl}" alt="Trainer QR Code" />
@@ -207,13 +207,13 @@ export default function TrainerQRPage() {
             <div class="trainer-info">
               <div class="trainer-name">${trainer.name}</div>
               <div class="trainer-description">
-                Müşterileriniz bu QR kodu okutarak ders girişi yapabilir
+                Üyeleriniz bu QR kodu okutarak ders girişi yapabilir
               </div>
             </div>
             
             <div class="instructions">
               <h3>Kullanım Talimatları</h3>
-              <p>Bu QR kodu salonunuzda görünür bir yere asabilirsiniz. Müşteriler telefonlarıyla QR kodu tarayarak kolayca ders girişi yapabilirler.</p>
+              <p>Bu QR kodu salonunuzda görünür bir yere asabilirsiniz. Üyeler telefonlarıyla QR kodu tarayarak kolayca ders girişi yapabilirler.</p>
             </div>
           </div>
         </body>
@@ -282,7 +282,7 @@ export default function TrainerQRPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Eğitmen QR Kodu</h1>
         <p className="text-gray-600 mt-1">
-          Müşterileriniz için QR kodu oluşturun ve yazdırın
+          Üyeleriniz için QR kodu oluşturun ve yazdırın
         </p>
       </div>
 
@@ -291,7 +291,7 @@ export default function TrainerQRPage() {
         <CardHeader className="text-center">
           <CardTitle className="flex items-center justify-center space-x-2">
             <QrCode className="h-6 w-6 text-purple-600" />
-            <span>Müşteri Giriş QR Kodu</span>
+            <span>Üye Giriş QR Kodu</span>
           </CardTitle>
         </CardHeader>
         
@@ -312,12 +312,12 @@ export default function TrainerQRPage() {
                     {trainer.name}
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Müşterileriniz bu QR kodu okutarak ders girişi yapabilir
+                    Üyeleriniz bu QR kodu okutarak ders girişi yapabilir
                   </p>
                   
                   {/* Simple Instruction */}
                   <p className="text-sm text-gray-500 mt-2">
-                    Müşteriler QR okutunca çıkan linke tıklasın
+                    Üyeler QR okutunca çıkan linke tıklasın
                   </p>
                   
                   {/* URL Status Indicator */}
@@ -384,7 +384,7 @@ export default function TrainerQRPage() {
                 </h3>
                 <p className="text-sm text-purple-700">
                   Bu QR kodu salonunuzda görünür bir yere asabilirsiniz. 
-                  Müşteriler telefonlarıyla QR kodu tarayarak kolayca ders girişi yapabilirler.
+                  Üyeler telefonlarıyla QR kodu tarayarak kolayca ders girişi yapabilirler.
                 </p>
               </div>
             </div>
@@ -397,7 +397,7 @@ export default function TrainerQRPage() {
               <div className="text-xs text-gray-600 space-y-1">
                 <p>Trainer ID: {trainer.id}</p>
                 <p>Base URL: {process.env.NEXT_PUBLIC_APP_URL || 'NOT SET'}</p>
-                <p>Full QR URL: {process.env.NEXT_PUBLIC_APP_URL || 'NOT SET'}/trainer-checkin/{trainer.id}</p>
+                <p>Full QR URL: {process.env.NEXT_PUBLIC_APP_URL || 'NOT SET'}/go/{trainer.id}</p>
                 <p>Environment: {process.env.NODE_ENV}</p>
                 {process.env.NEXT_PUBLIC_APP_URL && (
                   <div className={`mt-2 p-2 rounded text-xs font-medium ${

@@ -335,7 +335,7 @@ export default function SellPackageModal({ isOpen, onClose, client, onPackageSol
         console.error('     * New Remaining Sessions:', newRemainingSessions)
         console.error('     * Query: UPDATE clients SET remaining_sessions = ?, updated_at = ? WHERE id = ?')
         
-        toast.error('Paket satıldı fakat müşteri bilgileri güncellenemedi')
+        toast.error('Paket satıldı fakat üye bilgileri güncellenemedi')
         return
       }
       
@@ -399,7 +399,7 @@ export default function SellPackageModal({ isOpen, onClose, client, onPackageSol
             Paket Sat - {client.name}
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Müşteri için uygun paketi seçin. Mevcut seanslar: {client.remaining_sessions || 0}
+            Üye için uygun paketi seçin. Mevcut seanslar: {client.remaining_sessions || 0}
           </DialogDescription>
         </DialogHeader>
         

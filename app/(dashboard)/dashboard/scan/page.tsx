@@ -123,7 +123,7 @@ export default function ManualCheckInPage() {
         .order('name')
 
       if (clientsError) {
-        toast.error('Müşteriler yüklenirken hata oluştu')
+        toast.error('Üyeler yüklenirken hata oluştu')
         return
       }
 
@@ -271,7 +271,7 @@ export default function ManualCheckInPage() {
 
   const handleCheckIn = async (client: Client) => {
     if (client.remaining_sessions <= 0) {
-      toast.error('Müşterinin kalan seansı bulunmamaktadır')
+      toast.error('Üyenin kalan seansı bulunmamaktadır')
       return
     }
 
@@ -380,7 +380,7 @@ export default function ManualCheckInPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Manuel Giriş</h1>
           <p className="text-gray-600 mt-1">
-            Müşteri check-in işlemlerini manuel olarak yönetin
+            Üye check-in işlemlerini manuel olarak yönetin
           </p>
         </div>
         <div className="text-right">
@@ -430,7 +430,7 @@ export default function ManualCheckInPage() {
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center">
               <Search className="h-5 w-5 mr-2" />
-              Müşteri Ara
+              Üye Ara
             </div>
             <div className="text-xs text-gray-500">
               📱 Telefon son 4 hanesi • ⬆️⬇️ Navigasyon • ↵ Giriş • Esc Temizle
@@ -440,7 +440,7 @@ export default function ManualCheckInPage() {
         <CardContent>
           <Input
             ref={searchInputRef}
-            placeholder="Müşteri adı veya telefon son 4 hanesi..."
+            placeholder="Üye adı veya telefon son 4 hanesi..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full"
@@ -501,7 +501,7 @@ export default function ManualCheckInPage() {
               className="flex items-center space-x-2"
             >
               <Users className="h-4 w-4" />
-              <span>Tüm Müşteriler</span>
+              <span>Tüm Üyeler</span>
               <Badge variant="secondary" className="ml-1">
                 {getFilterCount('all')}
               </Badge>
@@ -513,7 +513,7 @@ export default function ManualCheckInPage() {
               className="flex items-center space-x-2"
             >
               <Calendar className="h-4 w-4" />
-              <span>Bugün Gelen Müşteriler</span>
+              <span>Bugün Gelen Üyeler</span>
               <Badge variant="secondary" className="ml-1">
                 {getFilterCount('today')}
               </Badge>
@@ -525,7 +525,7 @@ export default function ManualCheckInPage() {
               className="flex items-center space-x-2"
             >
               <AlertCircle className="h-4 w-4" />
-              <span>Dersi Biten Müşteriler</span>
+              <span>Dersi Biten Üyeler</span>
               <Badge variant="secondary" className="ml-1">
                 {getFilterCount('no_sessions')}
               </Badge>
@@ -544,7 +544,7 @@ export default function ManualCheckInPage() {
                 <p className="text-gray-600">
                   {searchTerm || activeFilter !== 'all' 
                     ? 'Arama sonucu bulunamadı' 
-                    : 'Henüz müşteri yok'
+                    : 'Henüz üye yok'
                   }
                 </p>
               </div>

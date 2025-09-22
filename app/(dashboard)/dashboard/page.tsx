@@ -76,7 +76,7 @@ export default function DashboardPage() {
   const handleScheduleSession = () => {
     // For now, navigate to clients page where they can select a client to schedule
     router.push('/dashboard/clients')
-    toast.info('Müşteri seçtikten sonra seans planlayabilirsiniz')
+    toast.info('Üye seçtikten sonra seans planlayabilirsiniz')
   }
 
   const handleManualCheckIn = () => {
@@ -324,13 +324,13 @@ export default function DashboardPage() {
         {/* Total Clients */}
         <Card className="shadow-md hover:shadow-lg transition-shadow duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium">Toplam Müşteri</CardTitle>
+            <CardTitle className="text-sm font-medium">Toplam Üye</CardTitle>
             <Users className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-gray-900">{stats?.totalClients ?? 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Sistemdeki aktif müşteriler
+              Sistemdeki aktif üyeler
             </p>
           </CardContent>
         </Card>
@@ -372,7 +372,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-3xl font-bold text-gray-900">{stats?.averageRating?.toFixed(1) ?? '5.0'}/5.0</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Müşteri memnuniyet puanı
+              Üye memnuniyet puanı
             </p>
           </CardContent>
         </Card>
@@ -398,7 +398,7 @@ export default function DashboardPage() {
             <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors duration-200">
               <Users className="h-7 w-7 text-purple-600 group-hover:scale-110 transition-transform duration-200" />
             </div>
-            <span className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors duration-200 text-center">Yeni Müşteri Ekle</span>
+            <span className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors duration-200 text-center">Yeni Üye Ekle</span>
           </Button>
           <Button 
             onClick={handleCreatePackage} 

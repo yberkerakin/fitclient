@@ -33,7 +33,7 @@
     {
       "name": "Manuel Giriş",
       "short_name": "Giriş",
-      "description": "Manuel müşteri girişi yapın",
+      "description": "Manuel üye girişi yapın",
       "url": "/dashboard/scan",
       "icons": [
         {

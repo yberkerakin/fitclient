@@ -434,7 +434,7 @@ export default function TrainerCheckInPage() {
               {trainer?.name}
             </h1>
             <p className="text-purple-200 text-sm">
-              Müşteri Giriş Sistemi
+              Üye Giriş Sistemi
             </p>
           </div>
         </div>
@@ -459,7 +459,7 @@ export default function TrainerCheckInPage() {
           {filteredClients.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-white/60">
-                {searchTerm ? 'Aradığınız müşteri bulunamadı' : 'Henüz müşteri bulunmuyor'}
+                {searchTerm ? 'Aradığınız üye bulunamadı' : 'Henüz üye bulunmuyor'}
               </p>
             </div>
           ) : (
@@ -502,7 +502,7 @@ export default function TrainerCheckInPage() {
         {/* Footer Info */}
         <div className="text-center">
           <p className="text-white/60 text-sm">
-            Toplam {clients.length} müşteri
+            Toplam {clients.length} üye
           </p>
           {isLoading && (
             <p className="text-yellow-200 text-sm mt-2">

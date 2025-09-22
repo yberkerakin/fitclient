@@ -209,7 +209,7 @@ export default function ClientsPage() {
           table: 'clients',
           query: 'SELECT * FROM clients WHERE trainer_id = ? ORDER BY created_at DESC'
         })
-        toast.error('Müşteriler yüklenirken hata oluştu')
+        toast.error('Üyeler yüklenirken hata oluştu')
         return
       }
 
@@ -264,7 +264,7 @@ export default function ClientsPage() {
       
     } catch (error) {
       console.error('❌ Unexpected error fetching clients:', error)
-      toast.error('Müşteriler yüklenirken beklenmeyen hata oluştu')
+      toast.error('Üyeler yüklenirken beklenmeyen hata oluştu')
     } finally {
       setLoading(false)
       console.log('🏁 Finished fetching clients')
@@ -368,7 +368,7 @@ export default function ClientsPage() {
           details: clientError.details,
           hint: clientError.hint
         })
-        toast.error('Müşteri eklenirken hata oluştu')
+        toast.error('Üye eklenirken hata oluştu')
         return
       }
 
@@ -404,11 +404,11 @@ export default function ClientsPage() {
       
       setClients(prevClients => [clientWithSessions, ...prevClients])
 
-      toast.success('Müşteri başarıyla eklendi!')
+      toast.success('Üye başarıyla eklendi!')
       
     } catch (error) {
       console.error('❌ Unexpected error adding client:', error)
-      toast.error('Müşteri eklenirken beklenmeyen hata oluştu')
+      toast.error('Üye eklenirken beklenmeyen hata oluştu')
     } finally {
       setSubmitting(false)
     }
@@ -468,12 +468,12 @@ export default function ClientsPage() {
     setFormData({ name: '', phone: '', email: '' })
     setPhoneError(null)
     setDialogOpen(false)
-    toast.success('Müşteri başarıyla eklendi!')
+    toast.success('Üye başarıyla eklendi!')
   }
 
   const handleClientAddError = (error: any) => {
     console.error('❌ Error adding client:', error)
-    toast.error('Müşteri eklenirken hata oluştu')
+    toast.error('Üye eklenirken hata oluştu')
   }
 
   const handleQRCodeClick = (client: Client) => {
@@ -598,7 +598,7 @@ export default function ClientsPage() {
           details: deleteError.details,
           hint: deleteError.hint
         })
-        toast.error('Müşteri silinirken hata oluştu')
+        toast.error('Üye silinirken hata oluştu')
         return
       }
 
@@ -606,11 +606,11 @@ export default function ClientsPage() {
 
       // Refresh clients list
       fetchClients()
-      toast.success('Müşteri başarıyla silindi!')
+      toast.success('Üye başarıyla silindi!')
       
     } catch (error) {
       console.error('❌ Unexpected error soft deleting client:', error)
-      toast.error('Müşteri silinirken beklenmeyen hata oluştu')
+      toast.error('Üye silinirken beklenmeyen hata oluştu')
     } finally {
       setDeletingClientId(null)
       setSubmitting(false)
@@ -674,7 +674,7 @@ export default function ClientsPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Müşteriler yükleniyor...</p>
+          <p className="text-gray-600">Üyeler yükleniyor...</p>
           <p className="text-gray-400 text-sm mt-2">Lütfen bekleyin</p>
         </div>
       </div>
@@ -694,9 +694,9 @@ export default function ClientsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Müşteriler</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Üyeler</h1>
           <p className="text-gray-600 mt-1">
-            {clients.length} müşteri
+            {clients.length} üye
           </p>
         </div>
         
@@ -734,14 +734,14 @@ export default function ClientsPage() {
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
                 <Plus className="h-4 w-4 mr-2" />
-                Yeni Müşteri Ekle
+                Yeni Üye Ekle
               </Button>
             </DialogTrigger>
             <DialogContent className="w-[95vw] max-w-md mx-auto p-4 sm:p-6 m-2 sm:m-0">
               <DialogHeader className="pb-4">
-                <DialogTitle className="text-lg">Yeni Müşteri Ekle</DialogTitle>
+                <DialogTitle className="text-lg">Yeni Üye Ekle</DialogTitle>
                 <DialogDescription className="text-sm">
-                  Müşteri bilgilerini girin. Sadece ad soyad zorunludur.
+                  Üye bilgilerini girin. Sadece ad soyad zorunludur.
                 </DialogDescription>
               </DialogHeader>
               
@@ -752,7 +752,7 @@ export default function ClientsPage() {
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Müşteri adı ve soyadı"
+                    placeholder="Üye adı ve soyadı"
                     disabled={submitting}
                     className="h-10 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400"
                   />
@@ -830,10 +830,10 @@ export default function ClientsPage() {
             <Users className="h-12 w-12 text-gray-400" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Henüz müşteri yok
+            Henüz üye yok
           </h3>
           <p className="text-gray-600 mb-6">
-            İlk müşterinizi ekleyin
+            İlk üyenizi ekleyin
           </p>
           <div className="space-y-3">
             <Button
@@ -841,7 +841,7 @@ export default function ClientsPage() {
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
             >
               <Plus className="h-4 w-4 mr-2" />
-              İlk Müşteriyi Ekle
+              İlk Üyeyi Ekle
             </Button>
             <div>
               <Button
@@ -986,7 +986,7 @@ export default function ClientsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Müşteri</TableHead>
+                    <TableHead>Üye</TableHead>
                     <TableHead>Telefon</TableHead>
                     <TableHead>E-posta</TableHead>
                     <TableHead>Kalan Seans</TableHead>
@@ -1126,11 +1126,11 @@ export default function ClientsPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Müşteriyi Sil</AlertDialogTitle>
+            <AlertDialogTitle>Üyeyi Sil</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
-              <p>Bu müşteriyi silmek istediğinize emin misiniz?</p>
-              <p className="text-red-600 font-medium">⚠️ Dikkat: Müşterinin tüm ders kayıtları da silinecektir!</p>
-              <p className="text-sm text-gray-600">Not: Müşteri verileri kalıcı olarak silinmeyecek, sadece gizlenecektir.</p>
+              <p>Bu üyeyi silmek istediğinize emin misiniz?</p>
+              <p className="text-red-600 font-medium">⚠️ Dikkat: Üyenin tüm ders kayıtları da silinecektir!</p>
+              <p className="text-sm text-gray-600">Not: Üye verileri kalıcı olarak silinmeyecek, sadece gizlenecektir.</p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -182,7 +182,7 @@ In development mode, the check-in page shows debug information including:
    - Example: `192.168.1.100`
 
 3. **Create a client:**
-   - Go to Dashboard > Müşteriler
+   - Go to Dashboard > Üyeler
    - Add a new client
    - The QR code will automatically use your local IP
 

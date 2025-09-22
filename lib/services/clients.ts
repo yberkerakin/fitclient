@@ -60,7 +60,7 @@ export async function getClientsByTrainer(trainerId: string): Promise<Client[]> 
 
     if (clientsError) {
       console.error('❌ Error fetching trainer clients:', clientsError)
-      throw new Error('Müşteriler yüklenirken hata oluştu')
+      throw new Error('Üyeler yüklenirken hata oluştu')
     }
 
     if (!clientsData || clientsData.length === 0) {
@@ -116,7 +116,7 @@ export async function calculateRemainingSessions(clientId: string): Promise<numb
 
     if (clientError || !clientData) {
       console.error(`❌ [${calcId}] Error fetching client:`, clientError)
-      throw new Error('Müşteri bilgileri alınırken hata oluştu')
+      throw new Error('Üye bilgileri alınırken hata oluştu')
     }
 
     const remainingSessions = clientData.remaining_sessions || 0

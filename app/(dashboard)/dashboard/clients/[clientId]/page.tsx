@@ -151,7 +151,7 @@ export default function ClientDetailsPage() {
         .single()
 
       if (clientError || !clientData) {
-        toast.error('Müşteri bulunamadı')
+        toast.error('Üye bulunamadı')
         router.push('/dashboard/clients')
         return
       }
@@ -205,7 +205,7 @@ export default function ClientDetailsPage() {
 
     } catch (error) {
       console.error('Error fetching client data:', error)
-      toast.error('Müşteri bilgileri yüklenirken hata oluştu')
+      toast.error('Üye bilgileri yüklenirken hata oluştu')
     } finally {
       setLoading(false)
     }
@@ -280,7 +280,7 @@ export default function ClientDetailsPage() {
 
       setClient(prev => prev ? { ...prev, [editing.field]: editing.value } : null)
       setEditing(null)
-      toast.success('Müşteri bilgileri güncellendi')
+      toast.success('Üye bilgileri güncellendi')
     } catch (error) {
       console.error('Error updating client:', error)
       toast.error('Güncelleme sırasında hata oluştu')
@@ -335,15 +335,15 @@ export default function ClientDetailsPage() {
         .eq('id', client.id)
 
       if (error) {
-        toast.error('Müşteri silinirken hata oluştu')
+        toast.error('Üye silinirken hata oluştu')
         return
       }
 
-      toast.success('Müşteri başarıyla silindi')
+      toast.success('Üye başarıyla silindi')
       router.push('/dashboard/clients')
     } catch (error) {
       console.error('Error deleting client:', error)
-      toast.error('Müşteri silinirken hata oluştu')
+      toast.error('Üye silinirken hata oluştu')
     } finally {
       setDeleting(false)
       setDeleteDialogOpen(false)
@@ -385,7 +385,7 @@ export default function ClientDetailsPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Müşteri bilgileri yükleniyor...</p>
+          <p className="text-gray-600">Üye bilgileri yükleniyor...</p>
         </div>
       </div>
     )
@@ -394,9 +394,9 @@ export default function ClientDetailsPage() {
   if (!client) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">Müşteri bulunamadı</p>
+        <p className="text-gray-600">Üye bulunamadı</p>
         <Button onClick={() => router.push('/dashboard/clients')} className="mt-4">
-          Müşteri Listesine Dön
+          Üye Listesine Dön
         </Button>
       </div>
     )
@@ -418,7 +418,7 @@ export default function ClientDetailsPage() {
             </Button>
             <div className="flex-1 min-w-0">
               <h1 className="text-lg font-bold text-gray-900 truncate">{client.name}</h1>
-              <p className="text-sm text-gray-600">Müşteri Detayları</p>
+              <p className="text-sm text-gray-600">Üye Detayları</p>
             </div>
           </div>
         </div>
@@ -471,7 +471,7 @@ export default function ClientDetailsPage() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <User className="h-5 w-5 text-purple-600" />
-              Müşteri Bilgileri
+              Üye Bilgileri
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -648,7 +648,7 @@ export default function ClientDetailsPage() {
             <CardTitle className="flex items-center justify-between text-lg">
               <div className="flex items-center gap-2">
                 <StickyNote className="h-5 w-5 text-purple-600" />
-                Müşteri Notları
+                Üye Notları
               </div>
               {!editingNotes && (
                 <Button
@@ -672,7 +672,7 @@ export default function ClientDetailsPage() {
                 <Textarea
                   value={notes}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNotes(e.target.value)}
-                  placeholder="Müşteri hakkında notlarınızı buraya yazın..."
+                  placeholder="Üye hakkında notlarınızı buraya yazın..."
                   className="min-h-[120px] text-base"
                 />
                 <div className="flex gap-2">
@@ -829,7 +829,7 @@ export default function ClientDetailsPage() {
             variant="destructive"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Müşteriyi Sil
+            Üyeyi Sil
           </Button>
         </div>
       </div>
@@ -838,11 +838,11 @@ export default function ClientDetailsPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Müşteriyi Sil</AlertDialogTitle>
+            <AlertDialogTitle>Üyeyi Sil</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
-              <p>Bu müşteriyi silmek istediğinize emin misiniz?</p>
-              <p className="text-red-600 font-medium">⚠️ Dikkat: Müşterinin tüm ders kayıtları da silinecektir!</p>
-              <p className="text-sm text-gray-600">Not: Müşteri verileri kalıcı olarak silinmeyecek, sadece gizlenecektir.</p>
+              <p>Bu üyeyi silmek istediğinize emin misiniz?</p>
+              <p className="text-red-600 font-medium">⚠️ Dikkat: Üyenin tüm ders kayıtları da silinecektir!</p>
+              <p className="text-sm text-gray-600">Not: Üye verileri kalıcı olarak silinmeyecek, sadece gizlenecektir.</p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

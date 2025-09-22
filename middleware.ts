@@ -68,48 +68,33 @@ export async function middleware(request: NextRequest) {
   
   console.log('🔍 ===== CHECKING PUBLIC ROUTES =====')
   
-  // Allow public access to trainer check-in routes (trainer-specific check-in pages)
-  if (pathname.startsWith('/trainer-checkin')) {
-    console.log('✅ PUBLIC ROUTE MATCH: /trainer-checkin - Allowing access without authentication')
-    console.log('🔓 Public trainer check-in route accessed:', pathname)
-    console.log('🛡️ ===== MIDDLEWARE EXECUTION COMPLETED (PUBLIC ROUTE) =====')
-    return response
-  }
+  // Complete list of public routes
+  const publicRoutes = [
+    '/',                    // Root path
+    '/login',              // Login page
+    '/register',           // Register page
+    '/trainer-checkin',    // Trainer check-in routes (and all sub-paths)
+    '/go',                 // Short QR code redirects (and all sub-paths)
+    '/checkin',            // Individual client check-ins (and all sub-paths)
+    '/test',               // Test/debug routes
+    '/_next',              // Next.js static files
+    '/api',                // API routes
+    '/favicon.ico',        // Favicon
+    '/manifest.json',      // PWA manifest
+    '/sw.js'               // Service worker
+  ]
   
-  // Allow public access to check-in routes (individual client check-ins)
-  if (pathname.startsWith('/checkin')) {
-    console.log('✅ PUBLIC ROUTE MATCH: /checkin - Allowing access without authentication')
-    console.log('🔓 Public check-in route accessed:', pathname)
-    console.log('🛡️ ===== MIDDLEWARE EXECUTION COMPLETED (PUBLIC ROUTE) =====')
-    return response
-  }
-
-  // Allow public access to auth routes
-  if (pathname.startsWith('/login') || pathname.startsWith('/register')) {
-    console.log('✅ PUBLIC ROUTE MATCH: /login or /register - Allowing access without authentication')
-    console.log('🔓 Public auth route accessed:', pathname)
-    console.log('🛡️ ===== MIDDLEWARE EXECUTION COMPLETED (PUBLIC ROUTE) =====')
-    return response
-  }
-
-  // Allow public access to test routes (for debugging)
-  if (pathname.startsWith('/test')) {
-    console.log('✅ PUBLIC ROUTE MATCH: /test - Allowing access without authentication')
-    console.log('🔓 Test route accessed:', pathname)
-    console.log('🛡️ ===== MIDDLEWARE EXECUTION COMPLETED (PUBLIC ROUTE) =====')
-    return response
-  }
-
-  // Allow public access to static assets and API routes
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/favicon.ico') ||
-    pathname.startsWith('/manifest.json') ||
-    pathname.startsWith('/sw.js')
-  ) {
-    console.log('✅ PUBLIC ROUTE MATCH: Static/API route - Allowing access without authentication')
-    console.log('🔓 Static/API route accessed:', pathname)
+  // Check if current pathname matches any public route
+  const isPublicRoute = publicRoutes.some(route => {
+    if (route === '/') {
+      return pathname === '/'
+    }
+    return pathname.startsWith(route)
+  })
+  
+  if (isPublicRoute) {
+    console.log('✅ PUBLIC ROUTE MATCH - Allowing access without authentication')
+    console.log('🔓 Public route accessed:', pathname)
     console.log('🛡️ ===== MIDDLEWARE EXECUTION COMPLETED (PUBLIC ROUTE) =====')
     return response
   }
