@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { createProgram } from '@/lib/services/programs';
-import { supabase } from '@/lib/supabase-client';
+import { createBrowserSupabaseClient } from '@/lib/supabase-client';
 
 interface Exercise {
   id: string;
@@ -72,6 +72,7 @@ export default function NewProgramPage() {
     setLoading(true);
 
     try {
+      const supabase = createBrowserSupabaseClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 

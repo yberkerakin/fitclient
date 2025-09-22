@@ -1,5 +1,7 @@
-import { supabase } from '@/lib/supabase-client';
+import { createBrowserSupabaseClient } from '@/lib/supabase-client';
 import bcrypt from 'bcryptjs';
+
+const supabase = createBrowserSupabaseClient();
 
 // Create member account
 export async function createMemberAccount(

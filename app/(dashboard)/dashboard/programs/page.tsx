@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { getProgramsByTrainer, deleteProgram } from '@/lib/services/programs';
-import { supabase } from '@/lib/supabase-client';
+import { createBrowserSupabaseClient } from '@/lib/supabase-client';
 import { WorkoutProgram } from '@/lib/types';
 import {
   AlertDialog,
@@ -33,6 +33,7 @@ export default function ProgramsPage() {
 
   async function fetchPrograms() {
     try {
+      const supabase = createBrowserSupabaseClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 

@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { supabase } from '@/lib/supabase-client';
+import { createBrowserSupabaseClient } from '@/lib/supabase-client';
 import { getProgramWithExercises, assignProgramToClient } from '@/lib/services/programs';
 import { WorkoutProgram, ProgramExercise, Client } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -35,6 +35,7 @@ export default function AssignProgramPage() {
       setProgram(programData);
 
       // Get clients
+      const supabase = createBrowserSupabaseClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 

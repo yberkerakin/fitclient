@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { supabase } from '@/lib/supabase-client';
+import { createBrowserSupabaseClient } from '@/lib/supabase-client';
 import { createMemberAccount } from '@/lib/services/member-accounts';
 
 interface Props {
@@ -47,16 +47,9 @@ export default function CreateMemberAccountModal({ isOpen, onClose, client, onSu
     setLoading(true);
 
     try {
-      // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: email,
-        password: password,
-        email_confirm: true
-      });
-
-      if (authError) throw authError;
-
-      // Create member account using service
+      const supabase = createBrowserSupabaseClient();
+      
+      // Create member account using service (handles auth user creation)
       await createMemberAccount(client.id, email, password);
 
       // Update client email if needed

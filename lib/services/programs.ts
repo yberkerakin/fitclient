@@ -1,4 +1,6 @@
-import { supabase } from '@/lib/supabase-client';
+import { createBrowserSupabaseClient } from '@/lib/supabase-client';
+
+const supabase = createBrowserSupabaseClient();
 
 // Get all programs for a trainer
 export async function getProgramsByTrainer(trainerId: string) {
