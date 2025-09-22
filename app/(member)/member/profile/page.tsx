@@ -10,7 +10,7 @@ import { User, Phone, Mail, Calendar, QrCode } from 'lucide-react';
 import { getMemberSession } from '@/lib/auth/member-auth';
 import { createBrowserSupabaseClient } from '@/lib/supabase-client';
 import { toast } from 'sonner';
-import QRCodeSVG from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function MemberProfilePage() {
