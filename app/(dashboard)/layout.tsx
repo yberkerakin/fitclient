@@ -14,7 +14,8 @@ import {
   Menu,
   FileText,
   Scan,
-  UserCheck
+  UserCheck,
+  Dumbbell
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { createBrowserSupabaseClient } from '@/lib/supabase-client'
@@ -157,6 +158,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       href: '/dashboard/packages',
       icon: Package,
       current: pathname === '/dashboard/packages'
+    },
+    {
+      name: 'Antrenman Programları',
+      href: '/dashboard/programs',
+      icon: FileText,
+      current: pathname === '/dashboard/programs' || pathname.startsWith('/dashboard/programs/')
     },
     {
       name: 'Manuel Giriş',

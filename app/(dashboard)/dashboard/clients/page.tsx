@@ -40,6 +40,7 @@ import { Badge } from '@/components/ui/badge'
 
 import QRCodeModal from '@/components/dashboard/QRCodeModal'
 import SellPackageModal from '@/components/dashboard/SellPackageModal'
+import CreateMemberAccountModal from '@/components/clients/CreateMemberAccountModal'
 
 interface Client {
   id: string
@@ -88,6 +89,9 @@ export default function ClientsPage() {
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
   const [deleteConfirmations, setDeleteConfirmations] = useState<Record<string, { confirmed: boolean; timestamp: number }>>({})
   const [deletingClientId, setDeletingClientId] = useState<string | null>(null)
+  const [memberAccountModalOpen, setMemberAccountModalOpen] = useState(false)
+  const [clientForMemberAccount, setClientForMemberAccount] = useState<Client | null>(null)
+  const [clientMemberAccounts, setClientMemberAccounts] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     console.log('🚀 ClientsPage mounted, starting data fetch...')
@@ -259,6 +263,25 @@ export default function ClientsPage() {
       console.log('✅ Setting clients state with:', clientsWithSessions)
       
       setClients(clientsWithSessions)
+      
+      // Fetch member accounts for all clients
+      if (clientsWithSessions && clientsWithSessions.length > 0) {
+        const clientIds = clientsWithSessions.map(client => client.id)
+        const { data: memberAccounts, error: memberError } = await supabase
+          .from('member_accounts')
+          .select('client_id')
+          .in('client_id', clientIds)
+          .eq('is_active', true)
+
+        if (!memberError && memberAccounts) {
+          const memberAccountMap: Record<string, boolean> = {}
+          memberAccounts.forEach(account => {
+            memberAccountMap[account.client_id] = true
+          })
+          setClientMemberAccounts(memberAccountMap)
+          console.log('✅ Member accounts fetched:', memberAccounts.length)
+        }
+      }
       
       console.log('✅ Clients state updated, current state will be:', clientsWithSessions)
       
@@ -508,6 +531,23 @@ export default function ClientsPage() {
     // Also refresh all client data to ensure consistency
     console.log('🔄 Refreshing all client data...')
     fetchClients()
+  }
+
+  const handleCreateMemberAccount = (client: Client) => {
+    setClientForMemberAccount(client)
+    setMemberAccountModalOpen(true)
+  }
+
+  const handleMemberAccountCreated = () => {
+    // Refresh the member accounts data
+    if (clientForMemberAccount) {
+      setClientMemberAccounts(prev => ({
+        ...prev,
+        [clientForMemberAccount.id]: true
+      }))
+    }
+    setMemberAccountModalOpen(false)
+    setClientForMemberAccount(null)
   }
 
   const handleDeleteClient = async (client: Client) => {
@@ -908,6 +948,23 @@ export default function ClientsPage() {
                         <QrCode className="h-4 w-4 mr-1" />
                         QR Kod
                       </Button>
+                      {clientMemberAccounts[client.id] ? (
+                        <Badge variant="secondary" className="bg-green-100 text-green-700">
+                          Giriş Var
+                        </Badge>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleCreateMemberAccount(client)
+                          }}
+                        >
+                          <User className="h-4 w-4 mr-1" />
+                          Giriş Oluştur
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"
@@ -1064,6 +1121,23 @@ export default function ClientsPage() {
                             <QrCode className="h-4 w-4 mr-1" />
                             QR Kod
                           </Button>
+                          {clientMemberAccounts[client.id] ? (
+                            <Badge variant="secondary" className="bg-green-100 text-green-700">
+                              Giriş Var
+                            </Badge>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleCreateMemberAccount(client)
+                              }}
+                            >
+                              <User className="h-4 w-4 mr-1" />
+                              Giriş Oluştur
+                            </Button>
+                          )}
                           <Button
                             variant="outline"
                             size="sm"
@@ -1147,6 +1221,17 @@ export default function ClientsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Create Member Account Modal */}
+      <CreateMemberAccountModal
+        isOpen={memberAccountModalOpen}
+        onClose={() => {
+          setMemberAccountModalOpen(false)
+          setClientForMemberAccount(null)
+        }}
+        client={clientForMemberAccount || { id: '', name: '' }}
+        onSuccess={handleMemberAccountCreated}
+      />
     </div>
   )
 } 

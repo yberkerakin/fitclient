@@ -30,6 +30,41 @@ export interface Database {
         Insert: CreateSessionInput
         Update: UpdateSessionInput
       }
+      member_accounts: {
+        Row: MemberAccount
+        Insert: CreateMemberAccountInput
+        Update: UpdateMemberAccountInput
+      }
+      workout_programs: {
+        Row: WorkoutProgram
+        Insert: CreateWorkoutProgramInput
+        Update: UpdateWorkoutProgramInput
+      }
+      program_exercises: {
+        Row: ProgramExercise
+        Insert: CreateProgramExerciseInput
+        Update: UpdateProgramExerciseInput
+      }
+      program_assignments: {
+        Row: ProgramAssignment
+        Insert: CreateProgramAssignmentInput
+        Update: UpdateProgramAssignmentInput
+      }
+      workout_sessions: {
+        Row: WorkoutSession
+        Insert: CreateWorkoutSessionInput
+        Update: UpdateWorkoutSessionInput
+      }
+      session_exercises: {
+        Row: SessionExercise
+        Insert: CreateSessionExerciseInput
+        Update: UpdateSessionExerciseInput
+      }
+      notifications: {
+        Row: Notification
+        Insert: CreateNotificationInput
+        Update: UpdateNotificationInput
+      }
     }
     Views: {
       client_summary: {
@@ -88,6 +123,73 @@ export interface Session {
 }
 
 // ============================================================================
+// WORKOUT FEATURE INTERFACES
+// ============================================================================
+
+export interface MemberAccount {
+  id: string
+  client_id: string
+  email: string
+  is_active: boolean
+  created_at: string
+}
+
+export interface WorkoutProgram {
+  id: string
+  trainer_id: string
+  name: string
+  program_date: string | null
+  created_at: string
+}
+
+export interface ProgramExercise {
+  id: string
+  program_id: string
+  exercise_name: string
+  sets: number
+  reps: number
+  weight: number | null
+  order_index: number
+}
+
+export interface ProgramAssignment {
+  id: string
+  program_id: string
+  client_id: string
+  total_sessions: number
+  completed_sessions: number
+  assigned_date: string
+}
+
+export interface WorkoutSession {
+  id: string
+  assignment_id: string
+  session_number: number
+  start_time: string | null
+  end_time: string | null
+  status: 'locked' | 'active' | 'completed'
+}
+
+export interface SessionExercise {
+  id: string
+  session_id: string
+  exercise_name: string
+  sets: number
+  reps: number
+  weight: number | null
+  difficulty_rating: number | null
+}
+
+export interface Notification {
+  id: string
+  client_id: string
+  type: 'program_assigned' | 'workout_completed' | 'session_unlocked'
+  message: string
+  is_read: boolean
+  created_at: string
+}
+
+// ============================================================================
 // VIEW INTERFACES
 // ============================================================================
 
@@ -137,6 +239,63 @@ export interface CreateSessionInput {
 }
 
 // ============================================================================
+// WORKOUT FEATURE CREATE INPUT TYPES
+// ============================================================================
+
+export interface CreateMemberAccountInput {
+  client_id: string
+  email: string
+  password_hash: string
+  is_active?: boolean
+}
+
+export interface CreateWorkoutProgramInput {
+  trainer_id: string
+  name: string
+  program_date?: string
+}
+
+export interface CreateProgramExerciseInput {
+  program_id: string
+  exercise_name: string
+  sets: number
+  reps: number
+  weight?: number
+  order_index: number
+}
+
+export interface CreateProgramAssignmentInput {
+  program_id: string
+  client_id: string
+  total_sessions: number
+  completed_sessions?: number
+}
+
+export interface CreateWorkoutSessionInput {
+  assignment_id: string
+  session_number: number
+  start_time?: string
+  end_time?: string
+  status?: 'locked' | 'active' | 'completed'
+}
+
+export interface CreateSessionExerciseInput {
+  session_id: string
+  exercise_name: string
+  sets: number
+  reps: number
+  weight?: number
+  difficulty_rating?: number
+}
+
+export interface CreateNotificationInput {
+  client_id: string
+  type: 'program_assigned' | 'workout_completed' | 'session_unlocked'
+  message: string
+  is_read?: boolean
+}
+
+// ============================================================================
 // UPDATE INPUT TYPES (for forms and API)
 // ============================================================================
 
@@ -173,6 +332,61 @@ export interface UpdateSessionInput {
 }
 
 // ============================================================================
+// WORKOUT FEATURE UPDATE INPUT TYPES
+// ============================================================================
+
+export interface UpdateMemberAccountInput {
+  email?: string
+  is_active?: boolean
+}
+
+export interface UpdateWorkoutProgramInput {
+  trainer_id?: string
+  name?: string
+  program_date?: string
+}
+
+export interface UpdateProgramExerciseInput {
+  program_id?: string
+  exercise_name?: string
+  sets?: number
+  reps?: number
+  weight?: number
+  order_index?: number
+}
+
+export interface UpdateProgramAssignmentInput {
+  program_id?: string
+  client_id?: string
+  total_sessions?: number
+  completed_sessions?: number
+}
+
+export interface UpdateWorkoutSessionInput {
+  assignment_id?: string
+  session_number?: number
+  start_time?: string
+  end_time?: string
+  status?: 'locked' | 'active' | 'completed'
+}
+
+export interface UpdateSessionExerciseInput {
+  session_id?: string
+  exercise_name?: string
+  sets?: number
+  reps?: number
+  weight?: number
+  difficulty_rating?: number
+}
+
+export interface UpdateNotificationInput {
+  client_id?: string
+  type?: 'program_assigned' | 'workout_completed' | 'session_unlocked'
+  message?: string
+  is_read?: boolean
+}
+
+// ============================================================================
 // FORM TYPES (for React Hook Form and validation)
 // ============================================================================
 
@@ -203,6 +417,25 @@ export interface PackageFormData {
 export interface PurchaseFormData {
   client_id: string
   package_id: string
+}
+
+export interface WorkoutProgramFormData {
+  name: string
+  program_date?: string
+}
+
+export interface ProgramExerciseFormData {
+  exercise_name: string
+  sets: number
+  reps: number
+  weight?: number
+  order_index: number
+}
+
+export interface MemberAccountFormData {
+  email: string
+  password: string
+  confirmPassword?: string
 }
 
 // ============================================================================
@@ -269,53 +502,3 @@ export function isValidPhone(phone: string): boolean {
   const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/
   return phoneRegex.test(phone.replace(/\s/g, ''))
 }
-
-// Form Types
-export interface LoginFormData {
-  email: string
-  password: string
-}
-
-export interface RegisterFormData {
-  name: string
-  email: string
-  password: string
-}
-
-export interface ClientFormData {
-  name: string
-  email?: string
-  phone?: string
-}
-
-export interface PackageFormData {
-  name: string
-  session_count: number
-  price: number
-}
-
-// API Response Types
-export interface ApiResponse<T> {
-  data?: T
-  error?: string
-  success: boolean
-}
-
-// Dashboard Stats Types
-export interface DashboardStats {
-  totalClients: number
-  activePackages: number
-  todaySessions: number
-  monthlyRevenue: number
-}
-
-// Client Summary Type (from the view)
-export interface ClientSummary {
-  client_id: string
-  client_name: string
-  client_email?: string
-  client_phone?: string
-  trainer_name: string
-  total_remaining_sessions: number
-  total_sessions_attended: number
-} 
