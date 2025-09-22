@@ -10,7 +10,7 @@ import { User, Phone, Mail, Calendar, QrCode } from 'lucide-react';
 import { getMemberSession } from '@/lib/auth/member-auth';
 import { createBrowserSupabaseClient } from '@/lib/supabase-client';
 import { toast } from 'sonner';
-import { QRCode } from 'qrcode.react';
+import QRCodeSVG from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function MemberProfilePage() {
@@ -181,7 +181,7 @@ export default function MemberProfilePage() {
           <div className="text-center">
             <h2 className="text-lg font-semibold mb-4">QR Kodum</h2>
             <div className="bg-gray-50 p-4 rounded-lg inline-block mb-4">
-              <QRCode value={qrValue} size={150} />
+              <QRCodeSVG value={qrValue} size={150} />
             </div>
             <p className="text-sm text-gray-600 mb-4">
               Salona girişte bu QR kodu okut
@@ -202,7 +202,7 @@ export default function MemberProfilePage() {
           </DialogHeader>
           <div className="text-center py-6">
             <div className="bg-white p-4 rounded-lg inline-block">
-              <QRCode value={qrValue} size={250} />
+              <QRCodeSVG value={qrValue} size={250} />
             </div>
             <p className="mt-4 text-sm text-gray-600">{member.client.name}</p>
           </div>
