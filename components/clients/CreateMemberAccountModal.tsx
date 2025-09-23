@@ -20,7 +20,7 @@ interface Props {
     email?: string;
     phone?: string;
   };
-  onSuccess: () => Promise<void>;
+  onSuccess: () => void;
 }
 
 export default function CreateMemberAccountModal({ isOpen, onClose, client, onSuccess }: Props) {
@@ -193,7 +193,7 @@ FitClient Ekibi`;
       setShowCredentials(true);
 
       // Only call onSuccess if everything completed successfully
-      await onSuccess();
+      onSuccess();
       
     } catch (error: any) {
       console.error('Member account creation failed:', error);
