@@ -210,3 +210,79 @@
 .animate-slide-up-delay-2 {
   animation: slide-up 0.5s ease-out 0.4s both;
 }
+
+/* Member Card Styles */
+.member-card {
+  width: 100%;
+  max-width: 340px;
+  height: 214px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+  border-radius: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  color: white;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+
+.member-card .card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.member-card .card-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.member-card .member-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.member-card .login-info {
+  font-size: 10px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.member-card .trainer-info {
+  font-size: 8px;
+  opacity: 0.8;
+  line-height: 1.2;
+}
+
+.member-card .qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-card .qr-code {
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-card .qr-label {
+  font-size: 8px;
+  text-align: center;
+  opacity: 0.9;
+  font-weight: 500;
+}

@@ -21,7 +21,8 @@ import {
   BarChart3,
   StickyNote,
   TrendingUp,
-  CalendarDays
+  CalendarDays,
+  CreditCard
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { createBrowserSupabaseClient } from '@/lib/supabase-client'
@@ -41,6 +42,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import MemberCardDialog from '@/components/clients/MemberCardDialog'
 
 interface Client {
   id: string
@@ -110,6 +112,7 @@ export default function ClientDetailsPage() {
   const [notes, setNotes] = useState('')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [showMemberCard, setShowMemberCard] = useState(false)
 
   useEffect(() => {
     if (clientId) {
@@ -795,12 +798,12 @@ export default function ClientDetailsPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 space-y-3 lg:hidden">
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            onClick={() => router.push(`/dashboard/clients/${clientId}/qr`)}
+            onClick={() => setShowMemberCard(true)}
             className="h-12 text-sm"
             variant="outline"
           >
-            <QrCode className="h-4 w-4 mr-2" />
-            QR Kodu
+            <CreditCard className="h-4 w-4 mr-2" />
+            Üye Kartı
           </Button>
           
           <Button 
@@ -833,6 +836,15 @@ export default function ClientDetailsPage() {
           </Button>
         </div>
       </div>
+
+      {/* Member Card Dialog */}
+      {showMemberCard && client && (
+        <MemberCardDialog 
+          client={client}
+          isOpen={showMemberCard}
+          onClose={() => setShowMemberCard(false)}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
