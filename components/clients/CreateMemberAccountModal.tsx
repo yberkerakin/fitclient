@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { createBrowserSupabaseClient } from '@/lib/supabase-client';
-import { createMemberAccount } from '@/lib/services/member-accounts';
 import { translateAuthError } from '@/lib/utils/auth-error-translator';
 import { Copy, MessageSquare, Mail, Phone, CheckCircle } from 'lucide-react';
 
@@ -31,6 +30,7 @@ export default function CreateMemberAccountModal({ isOpen, onClose, client, onSu
   const [showCredentials, setShowCredentials] = useState(false);
   const [generatedCredentials, setGeneratedCredentials] = useState<{email: string, password: string} | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [authData, setAuthData] = useState<any>(null);
 
 
   function generatePassword() {
@@ -101,10 +101,43 @@ FitClient Ekibi`;
     try {
       const supabase = createBrowserSupabaseClient();
       
-      // Create member account using service (handles auth user creation)
-      await createMemberAccount(client.id, email, password);
+      // Step 1: Create auth user using regular signUp (works with anon key)
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/member/login`
+        }
+      });
 
-      // Update client email if needed
+      if (authError) {
+        throw new Error(authError.message);
+      }
+
+      if (!authData.user) {
+        throw new Error('Kullanıcı oluşturulamadı');
+      }
+
+      // Store auth data for display
+      setAuthData(authData);
+
+      // Step 2: Create member_accounts record
+      const { data: memberAccount, error: memberError } = await supabase
+        .from('member_accounts')
+        .insert({
+          client_id: client.id,
+          email: email,
+          password_hash: 'managed_by_supabase_auth', // Password handled by Supabase Auth
+          is_active: true
+        })
+        .select()
+        .single();
+
+      if (memberError) {
+        throw new Error(`Üye hesabı oluşturulamadı: ${memberError.message}`);
+      }
+
+      // Step 3: Update client email if needed
       if (client.email !== email) {
         await supabase
           .from('clients')
@@ -112,7 +145,12 @@ FitClient Ekibi`;
           .eq('id', client.id);
       }
 
-      toast.success('Üye girişi oluşturuldu');
+      // Check if email confirmation is required
+      if (authData.user && !authData.user.email_confirmed_at) {
+        toast.success('Üye girişi oluşturuldu! Email doğrulama linki gönderildi.');
+      } else {
+        toast.success('Üye girişi oluşturuldu!');
+      }
       
       // Show credentials to trainer
       setGeneratedCredentials({ email, password });
@@ -129,8 +167,19 @@ FitClient Ekibi`;
     }
   }
 
+  // Reset state when modal closes
+  function handleClose() {
+    setShowCredentials(false);
+    setGeneratedCredentials(null);
+    setAuthData(null);
+    setCopiedField(null);
+    setEmail(client.email || '');
+    setPassword('');
+    onClose();
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Üye Girişi Oluştur - {client.name}</DialogTitle>
@@ -173,7 +222,7 @@ FitClient Ekibi`;
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={handleClose}>
                 İptal
               </Button>
               <Button type="submit" disabled={loading}>
@@ -191,6 +240,11 @@ FitClient Ekibi`;
               
               <p className="text-green-700 text-sm mb-4">
                 Bu bilgileri üyeye iletin. Üye bu bilgilerle https://app.fitclient.co/member/login adresinden giriş yapabilir.
+                {!authData?.user?.email_confirmed_at && (
+                  <span className="block mt-2 font-medium text-orange-700">
+                    ⚠️ Email doğrulama linki gönderildi. Üye önce emailini doğrulamalı.
+                  </span>
+                )}
               </p>
               
               <Card className="p-4 bg-white">
@@ -304,7 +358,7 @@ FitClient Ekibi`;
             </div>
 
             <DialogFooter>
-              <Button onClick={onClose}>
+              <Button onClick={handleClose}>
                 Tamam
               </Button>
             </DialogFooter>
