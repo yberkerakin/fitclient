@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Dumbbell } from 'lucide-react';
 import { toast } from 'sonner';
 import { createBrowserSupabaseClient } from '@/lib/supabase-client';
+import { authenticateMember } from '@/lib/services/member-accounts';
+import { translateAuthError } from '@/lib/utils/auth-error-translator';
 import Link from 'next/link';
 
 export default function MemberLoginPage() {
@@ -17,37 +19,21 @@ export default function MemberLoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const supabase = createBrowserSupabaseClient();
+      // Use our authenticateMember service
+      await authenticateMember(email, password);
       
-      // Sign in with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (authError) throw authError;
-
-      // Verify this is a member account
-      const { data: memberAccount, error: memberError } = await supabase
-        .from('member_accounts')
-        .select('id, client_id')
-        .eq('email', email)
-        .single();
-
-      if (memberError || !memberAccount) {
-        await supabase.auth.signOut();
-        throw new Error('Bu e-posta adresi ile üye girişi bulunamadı');
-      }
-
       toast.success('Giriş başarılı!');
       router.push('/member/dashboard');
     } catch (error: any) {
-      toast.error(error.message || 'Giriş başarısız');
+      // Translate the error message to Turkish
+      const translatedError = translateAuthError(error.message || 'Giriş başarısız');
+      toast.error(translatedError);
     } finally {
       setLoading(false);
     }

@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { createBrowserSupabaseClient } from '@/lib/supabase-client';
 import { createMemberAccount } from '@/lib/services/member-accounts';
+import { translateAuthError } from '@/lib/utils/auth-error-translator';
 import { Copy, MessageSquare, Mail, Phone, CheckCircle } from 'lucide-react';
 
 interface Props {
@@ -30,6 +31,7 @@ export default function CreateMemberAccountModal({ isOpen, onClose, client, onSu
   const [showCredentials, setShowCredentials] = useState(false);
   const [generatedCredentials, setGeneratedCredentials] = useState<{email: string, password: string} | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
 
   function generatePassword() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -119,7 +121,9 @@ FitClient Ekibi`;
       onSuccess();
     } catch (error: any) {
       console.error(error);
-      toast.error(error.message || 'Üye girişi oluşturulamadı');
+      // Translate the error message to Turkish
+      const translatedError = translateAuthError(error.message || 'Üye girişi oluşturulamadı');
+      toast.error(translatedError);
     } finally {
       setLoading(false);
     }
