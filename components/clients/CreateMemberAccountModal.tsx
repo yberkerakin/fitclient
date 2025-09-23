@@ -20,7 +20,7 @@ interface Props {
     email?: string;
     phone?: string;
   };
-  onSuccess: () => void;
+  onSuccess: () => Promise<void>;
 }
 
 export default function CreateMemberAccountModal({ isOpen, onClose, client, onSuccess }: Props) {
@@ -97,11 +97,14 @@ FitClient Ekibi`;
     }
 
     setLoading(true);
+    let authUserCreated = false;
 
     try {
       const supabase = createBrowserSupabaseClient();
       
       // Step 1: Create auth user using regular signUp (works with anon key)
+      console.log('Starting member account creation for:', { clientId: client.id, email });
+      
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email,
         password: password,
@@ -110,58 +113,104 @@ FitClient Ekibi`;
         }
       });
 
+      // Log auth creation result
+      console.log('Auth signup result:', { authData, authError });
+
       if (authError) {
+        console.error('Auth creation failed:', authError);
         throw new Error(authError.message);
       }
 
       if (!authData.user) {
-        throw new Error('Kullanıcı oluşturulamadı');
+        console.error('No user returned from auth creation');
+        throw new Error('Auth kullanıcısı oluşturulamadı');
       }
+
+      authUserCreated = true;
+      console.log('Auth user created successfully:', {
+        id: authData.user.id,
+        email: authData.user.email,
+        emailConfirmed: authData.user.email_confirmed_at
+      });
 
       // Store auth data for display
       setAuthData(authData);
 
-      // Step 2: Create member_accounts record
-      const { data: memberAccount, error: memberError } = await supabase
+      // Step 2: Create member_accounts record with proper error handling
+      console.log('Creating member_accounts record...');
+      
+      const { data: memberData, error: memberError } = await supabase
         .from('member_accounts')
         .insert({
           client_id: client.id,
           email: email,
-          password_hash: 'managed_by_supabase_auth', // Password handled by Supabase Auth
+          password_hash: 'managed_by_supabase_auth',
           is_active: true
         })
         .select()
         .single();
 
+      // Log the member account creation result
+      console.log('Member account result:', { memberData, memberError });
+
       if (memberError) {
-        throw new Error(`Üye hesabı oluşturulamadı: ${memberError.message}`);
+        console.error('Member account creation failed:', memberError);
+        
+        // Since we can't delete auth users from client side, we'll just show an error
+        // The auth user will remain but the member_accounts record won't exist
+        throw new Error(`Üye hesabı kaydı oluşturulamadı: ${memberError.message}`);
       }
+
+      console.log('Member account created successfully:', memberData);
 
       // Step 3: Update client email if needed
       if (client.email !== email) {
-        await supabase
+        console.log('Updating client email...');
+        const { error: clientUpdateError } = await supabase
           .from('clients')
           .update({ email })
           .eq('id', client.id);
+
+        if (clientUpdateError) {
+          console.warn('Client email update failed:', clientUpdateError);
+          // Don't throw here, this is not critical
+        } else {
+          console.log('Client email updated successfully');
+        }
       }
 
-      // Check if email confirmation is required
+      // Success - show appropriate message
       if (authData.user && !authData.user.email_confirmed_at) {
         toast.success('Üye girişi oluşturuldu! Email doğrulama linki gönderildi.');
+        console.log('Email confirmation required');
       } else {
         toast.success('Üye girişi oluşturuldu!');
+        console.log('Email already confirmed or confirmation not required');
       }
       
       // Show credentials to trainer
       setGeneratedCredentials({ email, password });
       setShowCredentials(true);
 
-      onSuccess();
+      // Only call onSuccess if everything completed successfully
+      await onSuccess();
+      
     } catch (error: any) {
-      console.error(error);
-      // Translate the error message to Turkish
-      const translatedError = translateAuthError(error.message || 'Üye girişi oluşturulamadı');
-      toast.error(translatedError);
+      console.error('Member account creation failed:', error);
+      
+      // If auth user was created but member account failed, show specific error
+      if (authUserCreated) {
+        const errorMessage = 'Auth kullanıcısı oluşturuldu ancak üye kaydı oluşturulamadı. Lütfen tekrar deneyin.';
+        toast.error(errorMessage);
+        console.error('Partial failure - auth created but member account failed');
+      } else {
+        // Translate the error message to Turkish
+        const translatedError = translateAuthError(error.message || 'Üye girişi oluşturulamadı');
+        toast.error(translatedError);
+      }
+      
+      // Don't close modal on error - let user try again
+      // onSuccess() is not called, so modal stays open
     } finally {
       setLoading(false);
     }

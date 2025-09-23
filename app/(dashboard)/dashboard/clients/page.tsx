@@ -538,16 +538,29 @@ export default function ClientsPage() {
     setMemberAccountModalOpen(true)
   }
 
-  const handleMemberAccountCreated = () => {
-    // Refresh the member accounts data
-    if (clientForMemberAccount) {
-      setClientMemberAccounts(prev => ({
-        ...prev,
-        [clientForMemberAccount.id]: true
-      }))
-    }
+  const handleMemberAccountCreated = async () => {
+    console.log('🔄 Member account created, refreshing all data...')
+    
+    // Close modal first
     setMemberAccountModalOpen(false)
     setClientForMemberAccount(null)
+    
+    // Show loading state
+    setLoading(true)
+    
+    try {
+      // Refresh all client data and member accounts
+      await fetchClients()
+      
+      console.log('✅ Data refreshed successfully after member account creation')
+      toast.success('Üye girişi oluşturuldu ve veriler güncellendi!')
+      
+    } catch (error) {
+      console.error('❌ Error refreshing data after member account creation:', error)
+      toast.error('Veriler güncellenirken hata oluştu')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleDeleteClient = async (client: Client) => {
@@ -1232,6 +1245,17 @@ export default function ClientsPage() {
         client={clientForMemberAccount || { id: '', name: '' }}
         onSuccess={handleMemberAccountCreated}
       />
+
+      {/* Loading Overlay for Data Refresh */}
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 flex flex-col items-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-4"></div>
+            <p className="text-gray-600">Veriler güncelleniyor...</p>
+            <p className="text-sm text-gray-400 mt-1">Lütfen bekleyin</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 
