@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { translateAuthError } from '@/lib/utils/auth-error-translator';
+import { createBrowserSupabaseClient } from '@/lib/supabase-client';
 
 interface Props {
   isOpen: boolean;
@@ -46,25 +47,48 @@ export default function CreateMemberAccountModal({ isOpen, onClose, client, onSu
     setLoading(true);
 
     try {
-      const response = await fetch('/api/create-member', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-          clientId: client.id
-        }),
+      const supabase = createBrowserSupabaseClient();
+      
+      // Get current user session to restore later
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      // Create auth user - this will log in the new user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: undefined // Don't redirect
+        }
       });
 
-      const data = await response.json();
+      if (authError) throw authError;
+      if (!authData.user) throw new Error('Auth kullanıcısı oluşturulamadı');
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Member oluşturulamadı');
+      // Create member_accounts record
+      const { error: memberError } = await supabase
+        .from('member_accounts')
+        .insert({
+          client_id: client.id,
+          email: email,
+          password_hash: 'handled_by_auth',
+          is_active: true
+        });
+
+      if (memberError) {
+        // If member_accounts creation fails, we can't easily rollback the auth user
+        // but the account will be inactive
+        throw new Error(`Üye hesabı oluşturulamadı: ${memberError.message}`);
       }
 
-      // Success - no session change!
+      // Restore trainer session
+      if (currentSession) {
+        await supabase.auth.setSession(currentSession);
+      } else {
+        // If no previous session, sign out the new user
+        await supabase.auth.signOut();
+      }
+
+      // Success!
       toast.success('Üye girişi oluşturuldu');
 
       // Show credentials
