@@ -5,6 +5,7 @@ import { Database } from './types'
 // Environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 // Server client for server components
 export async function createServerSupabaseClient() {
@@ -50,6 +51,16 @@ export async function createRouteHandlerSupabaseClient() {
           // user sessions.
         }
       },
+    },
+  })
+}
+
+// Admin client for server-side admin operations (uses service role key)
+export function createAdminSupabaseClient() {
+  return createServerClient<Database>(supabaseUrl, supabaseServiceKey, {
+    cookies: {
+      getAll() { return [] },
+      setAll() { /* No-op for admin client */ }
     },
   })
 }
