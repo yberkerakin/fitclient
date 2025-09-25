@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Dumbbell, Users, UserCheck } from 'lucide-react';
+import { Dumbbell, Users, UserCheck, UserPlus } from 'lucide-react';
 
 export default function HomePage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function HomePage() {
           <p className="text-xl text-white/80">Fitness İşletme Yönetim Sistemi</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {/* Trainer Login */}
           <Card className="p-8 hover:shadow-xl transition-shadow cursor-pointer" onClick={() => router.push('/login')}>
             <div className="text-center">
@@ -43,11 +43,23 @@ export default function HomePage() {
               <Button variant="outline" className="w-full">Üye Olarak Giriş Yap</Button>
             </div>
           </Card>
+
+          {/* New Member Registration */}
+          <Card className="p-8 hover:shadow-xl transition-shadow cursor-pointer" onClick={() => router.push('/member/register')}>
+            <div className="text-center">
+              <UserPlus className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">Yeni Üye Kaydı</h2>
+              <p className="text-gray-600 mb-4">
+                Fitness salonuna yeni üyeyseniz buradan kayıt olun
+              </p>
+              <Button variant="outline" className="w-full">Üye Olarak Kayıt Ol</Button>
+            </div>
+          </Card>
         </div>
 
         <div className="text-center mt-8">
           <p className="text-white/60">
-            Henüz hesabınız yok mu? Eğitmeninizden giriş bilgilerinizi isteyin.
+            Fitness salonu yönetimi için güvenilir çözüm
           </p>
         </div>
       </div>

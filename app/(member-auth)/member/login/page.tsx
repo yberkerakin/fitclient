@@ -78,7 +78,13 @@ export default function MemberLoginPage() {
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-sm">
+        <div className="mt-6 text-center text-sm space-y-2">
+          <p className="text-gray-500">
+            Hesabınız yok mu?{' '}
+            <Link href="/member/register" className="text-purple-600 hover:underline">
+              Üye olun
+            </Link>
+          </p>
           <p className="text-gray-500">
             Eğitmen misiniz?{' '}
             <Link href="/login" className="text-purple-600 hover:underline">

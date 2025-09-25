@@ -40,7 +40,6 @@ import { Badge } from '@/components/ui/badge'
 
 import QRCodeModal from '@/components/dashboard/QRCodeModal'
 import SellPackageModal from '@/components/dashboard/SellPackageModal'
-import CreateMemberAccountModal from '@/components/clients/CreateMemberAccountModal'
 
 interface Client {
   id: string
@@ -89,8 +88,6 @@ export default function ClientsPage() {
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
   const [deleteConfirmations, setDeleteConfirmations] = useState<Record<string, { confirmed: boolean; timestamp: number }>>({})
   const [deletingClientId, setDeletingClientId] = useState<string | null>(null)
-  const [memberAccountModalOpen, setMemberAccountModalOpen] = useState(false)
-  const [clientForMemberAccount, setClientForMemberAccount] = useState<Client | null>(null)
   const [clientMemberAccounts, setClientMemberAccounts] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
@@ -533,22 +530,6 @@ export default function ClientsPage() {
     fetchClients()
   }
 
-  const handleCreateMemberAccount = (client: Client) => {
-    setClientForMemberAccount(client)
-    setMemberAccountModalOpen(true)
-  }
-
-  const handleMemberAccountCreated = () => {
-    // Refresh the member accounts data
-    if (clientForMemberAccount) {
-      setClientMemberAccounts(prev => ({
-        ...prev,
-        [clientForMemberAccount.id]: true
-      }))
-    }
-    setMemberAccountModalOpen(false)
-    setClientForMemberAccount(null)
-  }
 
   const handleDeleteClient = async (client: Client) => {
     const now = Date.now()
@@ -737,6 +718,9 @@ export default function ClientsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Üyeler</h1>
           <p className="text-gray-600 mt-1">
             {clients.length} üye
+          </p>
+          <p className="text-sm text-blue-600 mt-2">
+            💡 Üyeler <strong>app.fitclient.co/member/register</strong> adresinden kayıt olabilir
           </p>
         </div>
         
@@ -948,22 +932,10 @@ export default function ClientsPage() {
                         <QrCode className="h-4 w-4 mr-1" />
                         QR Kod
                       </Button>
-                      {clientMemberAccounts[client.id] ? (
+                      {clientMemberAccounts[client.id] && (
                         <Badge variant="secondary" className="bg-green-100 text-green-700">
-                          Giriş Var
+                          Üye Girişi Aktif
                         </Badge>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleCreateMemberAccount(client)
-                          }}
-                        >
-                          <User className="h-4 w-4 mr-1" />
-                          Giriş Oluştur
-                        </Button>
                       )}
                       <Button
                         variant="outline"
@@ -1121,22 +1093,10 @@ export default function ClientsPage() {
                             <QrCode className="h-4 w-4 mr-1" />
                             QR Kod
                           </Button>
-                          {clientMemberAccounts[client.id] ? (
+                          {clientMemberAccounts[client.id] && (
                             <Badge variant="secondary" className="bg-green-100 text-green-700">
-                              Giriş Var
+                              Üye Girişi Aktif
                             </Badge>
-                          ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleCreateMemberAccount(client)
-                              }}
-                            >
-                              <User className="h-4 w-4 mr-1" />
-                              Giriş Oluştur
-                            </Button>
                           )}
                           <Button
                             variant="outline"
@@ -1222,16 +1182,6 @@ export default function ClientsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Create Member Account Modal */}
-      <CreateMemberAccountModal
-        isOpen={memberAccountModalOpen}
-        onClose={() => {
-          setMemberAccountModalOpen(false)
-          setClientForMemberAccount(null)
-        }}
-        client={clientForMemberAccount || { id: '', name: '' }}
-        onSuccess={handleMemberAccountCreated}
-      />
     </div>
   )
 } 
